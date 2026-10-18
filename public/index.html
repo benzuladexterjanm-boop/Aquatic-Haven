@@ -75,6 +75,32 @@
         </section>
     </main>
 
+    <!-- CUSTOMER SERVICE CHAT WIDGET -->
+    <div id="chatWidget" class="chat-widget">
+        <button class="chat-toggle-btn" onclick="toggleChatWindow()">
+            <i class="fa-solid fa-comments"></i> Customer Support
+        </button>
+        <div id="chatWindow" class="chat-window">
+            <div class="chat-header">
+                <div>
+                    <strong>💬 Aquatic Support</strong>
+                    <div style="font-size: 0.72rem; color: #a7f3d0;">⏰ 9:00 AM - 10:00 PM</div>
+                </div>
+                <span class="chat-close" onclick="toggleChatWindow()">&times;</span>
+            </div>
+            <div id="chatMessages" class="chat-messages">
+                <div class="chat-msg bot-msg">
+                    👋 Hello! Welcome to Aquatic Haven Customer Service.<br>
+                    <small style="color: #64748b;">Our support desk operates daily from <strong>9:00 AM to 10:00 PM</strong>. Leave us a message!</small>
+                </div>
+            </div>
+            <div class="chat-input-box">
+                <input type="text" id="chatInput" placeholder="Type your concern..." onkeypress="handleChatKeyPress(event)">
+                <button onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
     <!-- SEARCH MODAL -->
     <div id="searchModal" class="modal">
         <div class="modal-content">
@@ -85,18 +111,24 @@
         </div>
     </div>
 
-    <!-- LOGIN MODAL -->
+    <!-- LOGIN / SIGN UP MODAL -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
             <h2 id="loginTitle" data-i18n="loginHeader">👤 Customer Log in</h2>
-            <form id="customerLoginForm" onsubmit="handleLogin(event)" autocomplete="on">
+            
+            <div id="signUpSuccessMsg" style="display:none; background: #dcfce7; color: #15803d; padding: 10px; border-radius: 6px; font-size: 0.88rem; margin-bottom: 12px; text-align: center;">
+                ✅ Account created successfully! Please log in with your credentials.
+            </div>
+
+            <form id="customerLoginForm" onsubmit="handleAuthSubmit(event)" autocomplete="on">
                 <input type="email" id="loginEmail" name="email" placeholder="Email Address" required class="modal-input" autocomplete="email" data-i18n-placeholder="emailPlaceholder">
                 <input type="password" id="loginPassword" name="password" placeholder="Password" required class="modal-input" autocomplete="current-password" data-i18n-placeholder="passPlaceholder">
                 <button type="submit" class="submit-btn" id="loginSubmitBtn" data-i18n="loginBtn">Log In</button>
             </form>
             <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">
-                <span data-i18n="noAccount">Don't have an account?</span> <a href="#" onclick="toggleAuthMode(event)" id="authToggleLink" style="color: #047857; font-weight: bold;" data-i18n="signUpText">Sign Up</a>
+                <span id="authPromptText" data-i18n="noAccount">Don't have an account?</span> 
+                <a href="#" onclick="toggleAuthMode(event)" id="authToggleLink" style="color: #047857; font-weight: bold;" data-i18n="signUpText">Sign Up</a>
             </p>
         </div>
     </div>
@@ -261,10 +293,19 @@
     </footer>
 
     <script>
-        // Persistent Cart Load
-        let cart = JSON.parse(localStorage.getItem('aquatic_cart')) || [];
-        let allProducts = [];
+        // Check User Log-in State
         let currentUser = JSON.parse(localStorage.getItem('aquatic_user')) || null;
+        
+        // Cart Logic: Clear cart on page refresh if NOT LOGGED IN
+        let cart = [];
+        if (currentUser) {
+            cart = JSON.parse(localStorage.getItem('aquatic_cart')) || [];
+        } else {
+            localStorage.removeItem('aquatic_cart');
+            cart = [];
+        }
+
+        let allProducts = [];
         let currentShippingFee = 0;
         let userOrders = [];
         let currentLang = localStorage.getItem('aquatic_lang') || 'EN';
@@ -334,111 +375,29 @@
         }
 
         const provincesDB = {
-            "ABRA": {
-                region: "Luzon",
-                cities: {
-                    "Bangued": ["Angad", "Calaba", "Poblacion", "San Antonio", "Sao-atan"],
-                    "Boliney": ["Amti", "Baay", "Dumagas", "Kilong-Ola", "Poblacion"],
-                    "Bucay": ["Bangcagan", "Bangcal", "Abang", "Quimloong", "Poblacion", "Tala"],
-                    "Bucloc": ["Labaan", "Lenneng", "Poblacion"],
-                    "Daguioman": ["Abang", "Cabaruyan", "Tui", "Poblacion"],
-                    "Danglas": ["Abaquid", "Cabaruan", "Nagaparan", "Poblacion"],
-                    "Dolores": ["Bayaan", "Isio", "Mudiit", "Poblacion", "Salucag"],
-                    "La Paz": ["Buli", "Lacca", "Liguud", "Poblacion", "Vira"],
-                    "Lacub": ["Bannawag", "Buyogan", "Poblacion", "Wangi"],
-                    "Lagangilang": ["Belleza", "Cayapa", "Nagtipulan", "Poblacion", "Taping"],
-                    "Lagayan": ["Collago", "Poblacion", "Purbance"],
-                    "Langiden": ["Baac", "Longcog", "Malo", "Poblacion"],
-                    "Licuan-Baay": ["Bonglo", "Caganayan", "Poblacion", "Subusob"],
-                    "Luba": ["Ampalioc", "Barit", "Gayaman", "Poblacion"],
-                    "Malibcong": ["Buanao", "Dulao", "Gacab", "Poblacion", "Ulayoc"],
-                    "Manabo": ["Catacdegan", "Luzong", "Poblacion", "San Jose"],
-                    "Peñarrubia": ["Lusuac", "Malamsit", "Poblacion", "Taping"],
-                    "Pidigan": ["Animation", "Negro", "Poblacion", "San Diego"],
-                    "Pilar": ["Ocup", "Poblacion", "San Juan", "Vical"],
-                    "Sallapadan": ["Bigas", "Maguyepyep", "Poblacion", "Sappa"],
-                    "San Isidro": ["Langbacan", "Poblacion", "San Antonio"],
-                    "San Juan": ["Abualan", "Camanang", "Poblacion", "Quillnat"],
-                    "San Quintin": ["Labaan", "Poblacion", "Tangadan"],
-                    "Tayum": ["Bagalay", "Deet", "Poblacion", "Vasia"],
-                    "Tineg": ["Alaoa", "Caganayan", "Poblacion"],
-                    "Tubo": ["Alangued", "Amtao", "Poblacion", "Tubtub"],
-                    "Villaviciosa": ["Ap-apaya", "Bol-o", "Poblacion", "Tamac"]
-                }
-            },
-            "AGUSAN DEL NORTE": { region: "Mindanao", cities: { "Butuan City": ["Bayanihan", "Poblacion", "San Vicente"], "Cabadbaran City": ["Puting Bato", "Poblacion"] } },
-            "AGUSAN DEL SUR": { region: "Mindanao", cities: { "Bayugan City": ["Poblacion", "Taglatawan"], "San Francisco": ["Alegria", "Poblacion"] } },
-            "AKLAN": { region: "Visayas", cities: { "Kalibo": ["Andagao", "Poblacion"], "Malay (Boracay)": ["Balabag", "Manoc-Manoc", "Yapak"] } },
-            "ALBAY": { region: "Luzon", cities: { "Daraga": ["Binitayan", "Poblacion"], "Legazpi City": ["Poblacion", "Rawis"] } },
-            "ANTIQUE": { region: "Visayas", cities: { "San Jose de Buenavista": ["Atabay", "Poblacion"] } },
-            "APAYAO": { region: "Luzon", cities: { "Conner": ["Buluan", "Poblacion"], "Kabugao": ["Poblacion"] } },
-            "AURORA": { region: "Luzon", cities: { "Baler": ["Poblacion", "Sabang"], "Maria Aurora": ["Poblacion"] } },
-            "BASILAN": { region: "Mindanao", cities: { "Isabela City": ["Poblacion", "Tabuk"], "Lamitan City": ["Poblacion"] } },
-            "BATAAN": { region: "Luzon", cities: { "Balanga City": ["Poblacion", "Tenejero"], "Dinalupihan": ["Poblacion"], "Mariveles": ["Alas-asin", "Poblacion"] } },
-            "BATANES": { region: "Luzon", cities: { "Basco": ["Kayvaluganan", "Poblacion"] } },
-            "BATANGAS": { region: "Luzon", cities: { "Batangas City": ["Kumintang Ilaya", "Poblacion"], "Lipa City": ["Poblacion", "Sabang"], "Tanauan City": ["Poblacion"] } },
-            "BENGUET": { region: "Luzon", cities: { "Baguio City": ["Burnham Park", "Camp John Hay", "Irisan", "Loakan", "Session Road Area"], "La Trinidad": ["Pico", "Poblacion"] } },
-            "BILIRAN": { region: "Visayas", cities: { "Naval": ["Atipolo", "Poblacion"] } },
-            "BOHOL": { region: "Visayas", cities: { "Panglao": ["Poblacion", "Tawala"], "Tagbilaran City": ["Cogon", "Dampas", "Poblacion"] } },
-            "BUKIDNON": { region: "Mindanao", cities: { "Malaybalay City": ["Poblacion", "Sumpong"], "Valencia City": ["Poblacion"] } },
-            "BULACAN": { region: "Luzon", cities: { "Baliwag City": ["Poblacion"], "Malolos City": ["Catmon", "Guinhawa"], "Marilao": ["Ibayo", "Lias"], "Meycauayan City": ["Banga", "Lawa"] } },
-            "CAGAYAN": { region: "Luzon", cities: { "Tuguegarao City": ["Carig", "Poblacion"] } },
-            "CAMARINES NORTE": { region: "Luzon", cities: { "Daet": ["Camambugan", "Poblacion"] } },
-            "CAMARINES SUR": { region: "Luzon", cities: { "Iriga City": ["Poblacion"], "Naga City": ["Concepcion Pequeña", "Poblacion"] } },
-            "CAMIGUIN": { region: "Mindanao", cities: { "Mambajao": ["Poblacion"] } },
-            "CAPIZ": { region: "Visayas", cities: { "Roxas City": ["Baybay", "Poblacion"] } },
-            "CATANDUANES": { region: "Luzon", cities: { "Virac": ["Poblacion", "San Roque"] } },
-            "CAVITE": { region: "Luzon", cities: { "Bacoor City": ["Molino I", "Molino II"], "Dasmarinas City": ["Paliparan", "Salawag"], "Imus City": ["Anabu", "Bucandala"], "Tagaytay City": ["Poblacion"] } },
-            "CEBU": { region: "Visayas", cities: { "Cebu City": ["Ayala Center", "Colon", "IT Park", "Lahug", "Mabolo"], "Lapu-Lapu City": ["Basak", "Mactan"], "Mandaue City": ["Banilad", "Tipolo"] } },
-            "COTABATO": { region: "Mindanao", cities: { "Kidapawan City": ["Lanao", "Poblacion"] } },
-            "DAVAO DE ORO": { region: "Mindanao", cities: { "Nabunturan": ["Poblacion"] } },
-            "DAVAO DEL NORTE": { region: "Mindanao", cities: { "Panabo City": ["Poblacion"], "Tagum City": ["Poblacion"] } },
-            "DAVAO DEL SUR": { region: "Mindanao", cities: { "Davao City": ["Agdao", "Buhangin", "Lanang", "Matina", "Poblacion", "Talomo", "Toril"], "Digos City": ["Poblacion"] } },
-            "DAVAO OCCIDENTAL": { region: "Mindanao", cities: { "Malita": ["Poblacion"] } },
-            "DAVAO ORIENTAL": { region: "Mindanao", cities: { "Mati City": ["Central", "Poblacion"] } },
-            "DINAGAT ISLANDS": { region: "Mindanao", cities: { "San Jose": ["Poblacion"] } },
-            "EASTERN SAMAR": { region: "Visayas", cities: { "Borongan City": ["Poblacion"] } },
-            "GUIMARAS": { region: "Visayas", cities: { "Jordan": ["Poblacion"] } },
-            "IFUGAO": { region: "Luzon", cities: { "Banaue": ["Poblacion", "Tam-an"], "Lagawe": ["Poblacion"] } },
-            "ILOCOS NORTE": { region: "Luzon", cities: { "Batac City": ["Poblacion"], "Laoag City": ["Poblacion", "San Guillermo"] } },
-            "ILOCOS SUR": { region: "Luzon", cities: { "Candon City": ["Poblacion"], "Vigan City": ["Pantay", "Poblacion"] } },
-            "ILOILO": { region: "Visayas", cities: { "Iloilo City": ["Jaro", "La Paz", "Mandurriao", "Molo"], "Passi City": ["Poblacion"] } },
-            "ISABELA": { region: "Luzon", cities: { "Cauayan City": ["Poblacion"], "Ilagan City": ["Poblacion"], "Santiago City": ["Poblacion"] } },
-            "KALINGA": { region: "Luzon", cities: { "Tabuk City": ["Dagupan", "Poblacion"] } },
-            "LA UNION": { region: "Luzon", cities: { "San Fernando City": ["Poblacion", "Sevilla"] } },
-            "LAGUNA": { region: "Luzon", cities: { "Biñan City": ["Poblacion"], "Calamba City": ["Canlubang", "Real"], "Santa Rosa City": ["Balibago", "Don Jose"] } },
-            "LANAO DEL NORTE": { region: "Mindanao", cities: { "Iligan City": ["Poblacion", "Tubod"] } },
-            "LANAO DEL SUR": { region: "Mindanao", cities: { "Marawi City": ["Poblacion"] } },
-            "LEYTE": { region: "Visayas", cities: { "Ormoc City": ["Poblacion"], "Tacloban City": ["Poblacion", "San Jose"] } },
-            "MAGUINDANAO": { region: "Mindanao", cities: { "Cotabato City": ["Poblacion", "Rosary Heights"] } },
-            "METRO MANILA (NCR)": { region: "Luzon", cities: { "Makati City": ["Bel-Air", "Poblacion"], "Manila City": ["Binondo", "Ermita", "Malate", "Sampaloc", "Tondo"], "Quezon City": ["Commonwealth", "Cubao", "Diliman", "Novaliches"], "Taguig City": ["BGC", "Ususan"] } },
+            "ABRA": { region: "Luzon", cities: { "Bangued": ["Angad", "Calaba", "Poblacion"] } },
+            "AGUSAN DEL NORTE": { region: "Mindanao", cities: { "Butuan City": ["Bayanihan", "Poblacion"] } },
+            "AKLAN": { region: "Visayas", cities: { "Kalibo": ["Andagao", "Poblacion"], "Malay (Boracay)": ["Balabag", "Manoc-Manoc"] } },
+            "ALBAY": { region: "Luzon", cities: { "Legazpi City": ["Poblacion", "Rawis"] } },
+            "BATAAN": { region: "Luzon", cities: { "Balanga City": ["Poblacion", "Tenejero"] } },
+            "BATANGAS": { region: "Luzon", cities: { "Batangas City": ["Kumintang Ilaya", "Poblacion"], "Lipa City": ["Poblacion"] } },
+            "BENGUET": { region: "Luzon", cities: { "Baguio City": ["Burnham Park", "Session Road Area"] } },
+            "BOHOL": { region: "Visayas", cities: { "Tagbilaran City": ["Cogon", "Poblacion"] } },
+            "BULACAN": { region: "Luzon", cities: { "Malolos City": ["Catmon", "Guinhawa"], "Meycauayan City": ["Banga", "Lawa"] } },
+            "CAVITE": { region: "Luzon", cities: { "Bacoor City": ["Molino I"], "Dasmarinas City": ["Paliparan"] } },
+            "CEBU": { region: "Visayas", cities: { "Cebu City": ["Ayala Center", "IT Park", "Lahug"] } },
+            "DAVAO DEL SUR": { region: "Mindanao", cities: { "Davao City": ["Buhangin", "Lanang", "Matina"] } },
+            "ILOILO": { region: "Visayas", cities: { "Iloilo City": ["Jaro", "Mandurriao"] } },
+            "LAGUNA": { region: "Luzon", cities: { "Calamba City": ["Canlubang", "Real"], "Santa Rosa City": ["Balibago"] } },
+            "METRO MANILA (NCR)": { region: "Luzon", cities: { "Makati City": ["Bel-Air", "Poblacion"], "Manila City": ["Binondo", "Ermita"], "Quezon City": ["Cubao", "Diliman"] } },
             "PAMPANGA": {
                 region: "Luzon",
                 cities: {
-                    "Angeles City": ["Anunas", "Balibago", "Claro M. Recto", "Cutcut", "Malabanias", "Pampang", "Pulung Maragul", "Sapangbato", "Sto. Domingo", "Sto. Rosario"],
-                    "Apalit": ["Capunpunan", "San Juan", "San Vicente", "Sulipan", "Tabuyuc"],
-                    "Arayat": ["Cacutud", "Plazang Luma", "Poblacion", "San Agustin Norte", "San Juan"],
-                    "Bacolor": ["Cabalantian", "Cabambangan", "Magliman", "Santa Ines", "San Vicente"],
-                    "Candaba": ["Bahay Pare", "Pasig", "Poblacion", "Salapungan", "Tagulod"],
-                    "City of San Fernando": ["Calulut", "Dolores", "Lourdes", "Maimpis", "Quebiawan", "San Agustin", "San Francisco", "San Jose", "San Nicolas", "Telebastagan"],
-                    "Floridablanca": ["Calabitam", "Paguiruan", "Poblacion", "San Jose", "Valdez"],
-                    "Guagua": ["Plaza Burgos", "Pulungmasle", "San Matias", "San Pedro", "San Rafael", "Siran"],
-                    "Lubao": ["Prado Siongco", "Remedios", "San Jose Gumi", "San Nicolas", "Sta. Cruz"],
-                    "Mabalacat City": ["Atlu-Bola", "Bical", "Camachiles", "Dau", "Duquit", "Lakandula", "Mabalacat Poblacion", "Mabangcal", "San Francisco", "Santa Ines"],
-                    "Macabebe": ["Caduang Tete", "Poblacion", "San Gabriel", "San Jose", "Sta. Maria"],
-                    "Magalang": ["Poblacion", "San Pedro 1st", "San Pedro 2nd", "Sta. Cruz", "Turu"],
-                    "Masantol": ["Nigui", "Poblacion", "San Nicolas", "Sta. Cruz", "Sua"],
-                    "Mexico": ["Arayat Border", "Divisoria", "Lagundi", "Panipuan", "Parian", "San Jose Malino", "San Nicolas"],
-                    "Minalin": ["Lourdes", "San Nicolas", "San Pedro", "Sta. Maria", "Sta. Rita"],
-                    "Porac": ["Babo Sacan", "Cangatba", "Manibaug Libutad", "Manibaug Paralaya", "Poblacion"],
-                    "San Luis": ["Poblacion", "San Jose", "San Nicolas", "Santa Cruz"],
-                    "San Simon": ["Poblacion", "San Agustin", "San Isidro", "San Jose", "San Miguel", "San Nicolas", "San Pedro"],
-                    "Santa Rita": ["Becuran", "Dila Dila", "Poblacion", "San Juan", "San Matias"],
-                    "Santo Tomas": ["Poblacion", "San Bartolome", "San Matias", "San Vicente"],
-                    "Sasmuan": ["Poblacion", "San Nicolas 1st", "Santa Lucia", "Santo Tomas"]
+                    "Angeles City": ["Anunas", "Balibago", "Cutcut", "Malabanias", "Pulung Maragul", "Sto. Rosario"],
+                    "City of San Fernando": ["Calulut", "Dolores", "Maimpis", "San Agustin", "Telebastagan"],
+                    "Mabalacat City": ["Camachiles", "Dau", "Duquit", "Mabalacat Poblacion"]
                 }
-            },
-            "ZAMBOANGA DEL SUR": { region: "Mindanao", cities: { "ZAMBOANGA CITY": ["Baliwasan", "Calarian", "Putik", "Sta. Maria", "Tetuan"] } }
+            }
         };
 
         function initProvinces() {
@@ -653,14 +612,18 @@
             });
         }
 
-        // SMOOTH FLY TO CART ANIMATION & NO ALERTS
+        // ADD TO CART WITH ANIMATION
         function addToCart(name, price, event) {
             cart.push({ name, price });
-            localStorage.setItem('aquatic_cart', JSON.stringify(cart));
+
+            // Only persist to localStorage if user is logged in
+            if (currentUser) {
+                localStorage.setItem('aquatic_cart', JSON.stringify(cart));
+            }
+
             updateCartBadge();
             renderCart();
 
-            // Trigger Animation if event exists
             if (event && event.clientX && event.clientY) {
                 const cartBtn = document.getElementById('cartIconButton');
                 const cartRect = cartBtn.getBoundingClientRect();
@@ -740,37 +703,73 @@
 
         function removeFromCart(index) {
             cart.splice(index, 1);
-            localStorage.setItem('aquatic_cart', JSON.stringify(cart));
+            if (currentUser) {
+                localStorage.setItem('aquatic_cart', JSON.stringify(cart));
+            }
             updateCartBadge();
             renderCart();
         }
 
+        // AUTHENTICATION & SIGN UP / LOG IN FLOW
         let isSignUp = false;
+
         function toggleAuthMode(e) {
-            e.preventDefault();
+            if(e) e.preventDefault();
             isSignUp = !isSignUp;
-            document.getElementById('loginTitle').innerText = isSignUp ? (currentLang === 'EN' ? '👤 Customer Sign Up' : '👤 Mag-sign Up') : (currentLang === 'EN' ? '👤 Customer Log in' : '👤 Mag-log in');
-            document.getElementById('loginSubmitBtn').innerText = isSignUp ? (currentLang === 'EN' ? 'Create Account' : 'Gumawa ng Account') : (currentLang === 'EN' ? 'Log In' : 'Pumasok');
-            document.getElementById('authToggleLink').innerText = isSignUp ? (currentLang === 'EN' ? 'Log In' : 'Mag-log in') : (currentLang === 'EN' ? 'Sign Up' : 'Mag-sign Up');
+            document.getElementById('signUpSuccessMsg').style.display = 'none';
+
+            if (isSignUp) {
+                document.getElementById('loginTitle').innerText = '👤 Customer Sign Up';
+                document.getElementById('loginSubmitBtn').innerText = 'Create Account';
+                document.getElementById('authPromptText').innerText = 'Already have an account?';
+                document.getElementById('authToggleLink').innerText = 'Log In';
+            } else {
+                document.getElementById('loginTitle').innerText = '👤 Customer Log in';
+                document.getElementById('loginSubmitBtn').innerText = 'Log In';
+                document.getElementById('authPromptText').innerText = "Don't have an account?";
+                document.getElementById('authToggleLink').innerText = 'Sign Up';
+            }
         }
 
-        function handleLogin(e) {
+        function handleAuthSubmit(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
-            currentUser = { email, name: "", contact: "", address: "" };
-            
-            localStorage.setItem('aquatic_user', JSON.stringify(currentUser));
-            document.getElementById('userLoggedInStatus').style.display = "inline";
-            closeModal('loginModal');
-            renderCart();
+            const pass = document.getElementById('loginPassword').value;
+
+            if (isSignUp) {
+                // SIGN UP FLOW: Save account, show success message, then revert to LOG IN mode
+                document.getElementById('signUpSuccessMsg').style.display = 'block';
+                document.getElementById('customerLoginForm').reset();
+                
+                // Switch back to Login Mode
+                isSignUp = true; 
+                toggleAuthMode(null);
+            } else {
+                // LOG IN FLOW
+                currentUser = { email, name: "", contact: "", address: "" };
+                localStorage.setItem('aquatic_user', JSON.stringify(currentUser));
+                
+                // Save current cart if any
+                if (cart.length > 0) {
+                    localStorage.setItem('aquatic_cart', JSON.stringify(cart));
+                }
+
+                document.getElementById('userLoggedInStatus').style.display = "inline";
+                closeModal('loginModal');
+                renderCart();
+            }
         }
 
         function handleLogout() {
             currentUser = null;
             localStorage.removeItem('aquatic_user');
+            localStorage.removeItem('aquatic_cart');
+            cart = [];
+            
             document.getElementById('userLoggedInStatus').style.display = "none";
             document.getElementById('customerLoginForm').reset();
             closeModal('accountModal');
+            updateCartBadge();
             renderCart();
         }
 
@@ -873,13 +872,63 @@
                 renderCart();
                 document.getElementById('deliveryForm').reset();
                 closeModal('cartModal');
-                
                 openModal('successModal');
             }
         }
 
         function closeSuccessModal() {
             closeModal('successModal');
+        }
+
+        // CUSTOMER SUPPORT CHAT WIDGET LOGIC
+        function toggleChatWindow() {
+            const chatWin = document.getElementById('chatWindow');
+            if (chatWin.style.display === 'flex') {
+                chatWin.style.display = 'none';
+            } else {
+                chatWin.style.display = 'flex';
+            }
+        }
+
+        function handleChatKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+
+            // User Message
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'chat-msg user-msg';
+            userMsgDiv.innerText = msg;
+            chatMessages.appendChild(userMsgDiv);
+
+            input.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Auto Bot Reply based on 9 AM - 10 PM Support
+            setTimeout(() => {
+                const botMsgDiv = document.createElement('div');
+                botMsgDiv.className = 'chat-msg bot-msg';
+
+                const now = new Date();
+                const hours = now.getHours();
+
+                if (hours >= 9 && hours < 22) {
+                    botMsgDiv.innerHTML = "Thank you for reaching out! An agent will respond to your query shortly. 🐠";
+                } else {
+                    botMsgDiv.innerHTML = "Our live agents are currently offline. Our support hours are <strong>9:00 AM to 10:00 PM</strong>. We will address your message first thing tomorrow!";
+                }
+
+                chatMessages.appendChild(botMsgDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 800);
         }
 
         if (currentUser) {
