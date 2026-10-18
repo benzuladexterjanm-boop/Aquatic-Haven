@@ -158,6 +158,128 @@ body {
     100% { transform: scale(1); }
 }
 
+/* CUSTOMER SUPPORT CHAT WIDGET */
+.chat-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.chat-toggle-btn {
+    background: #047857;
+    color: white;
+    border: 2px solid #a7f3d0;
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.chat-toggle-btn:hover {
+    background: #065f46;
+    transform: translateY(-3px);
+}
+
+.chat-window {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    bottom: 60px;
+    right: 0;
+    width: 320px;
+    height: 400px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    border: 1px solid #cbd5e1;
+    overflow: hidden;
+}
+
+.chat-header {
+    background: #064e3b;
+    color: white;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-close {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #cbd5e1;
+}
+
+.chat-close:hover {
+    color: white;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    padding: 12px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f8fafc;
+}
+
+.chat-msg {
+    max-width: 80%;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.bot-msg {
+    background: #e2e8f0;
+    color: #1e293b;
+    align-self: flex-start;
+    border-bottom-left-radius: 2px;
+}
+
+.user-msg {
+    background: #047857;
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 2px;
+}
+
+.chat-input-box {
+    display: flex;
+    padding: 8px;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+}
+
+.chat-input-box input {
+    flex-grow: 1;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    outline: none;
+}
+
+.chat-input-box button {
+    background: #047857;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    margin-left: 6px;
+    cursor: pointer;
+}
+
 .hero-banner {
     background: linear-gradient(135deg, #047857, #065f46);
     color: white;
