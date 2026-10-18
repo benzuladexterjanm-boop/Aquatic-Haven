@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aquatic Haven - Pet Online Shop</title>
+    <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=100">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-brand">
+            <h1>🌿 Aquatic Haven</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="#hero" class="nav-item active" data-i18n="navHome">Home</a>
+            <a href="#plantsSection" class="nav-item" data-i18n="navPlants">Plants</a>
+            <a href="#fishesSection" class="nav-item" data-i18n="navFishes">Fishes</a>
+            <a href="#foodSection" class="nav-item" data-i18n="navFood">Food & Medicine</a>
+            <div class="dropdown">
+                <a href="#accessoriesSection" class="nav-item">
+                    <span data-i18n="navAccessories">Accessories</span> <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: 2px;"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a href="#accessoriesSection">Aquarium Tanks</a>
+                    <a href="#accessoriesSection">Air pumps</a>
+                    <a href="#accessoriesSection">Lights</a>
+                    <a href="#accessoriesSection">Heaters</a>
+                </div>
+            </div>
+            <a href="#contactSection" class="nav-item" data-i18n="navContact">Contact</a>
+        </nav>
+
+        <div class="nav-icons">
+            <button onclick="toggleLanguage()" class="lang-btn" id="langBtn" title="Switch Language">
+                🌐 <span id="langText">Tagalog</span>
+            </button>
+
+            <button class="icon-btn" onclick="openModal('searchModal')" title="Search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <button class="icon-btn" onclick="checkUserAndOpenModal()" title="Customer Account">
+                <i class="fa-regular fa-user"></i>
+                <span id="userLoggedInStatus" style="font-size: 0.7rem; color: #4ade80; display: none;">●</span>
+            </button>
+            <button class="icon-btn cart-icon-btn" id="cartIconButton" onclick="openModal('cartModal')" title="Shopping Cart">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span id="cartCountBadge" class="badge">0</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="hero-banner" id="hero">
+        <h2 data-i18n="heroTitle">Premium Freshwater Life, Aquariums & Accessories</h2>
+        <p data-i18n="heroSub">Your one-stop shop for healthy fishes and top-tier aquatic equipment</p>
+    </div>
+
+    <main class="container">
+        <section class="category-section" id="fishesSection">
+            <h2 class="section-title" data-i18n="secFishes">🐟 Freshwater Fishes</h2>
+            <div id="fishList" class="grid"></div>
+        </section>
+        <section class="category-section" id="plantsSection">
+            <h2 class="section-title" data-i18n="secPlants">🌱 Aquatic Plants</h2>
+            <div id="plantsList" class="grid"></div>
+        </section>
+        <section class="category-section" id="foodSection">
+            <h2 class="section-title" data-i18n="secFood">🥫 Food & Medicine</h2>
+            <div id="foodList" class="grid"></div>
+        </section>
+        <section class="category-section" id="accessoriesSection">
+            <h2 class="section-title" data-i18n="secAccessories">⚙️ Aquariums & Accessories</h2>
+            <div id="accessoriesList" class="grid"></div>
+        </section>
+    </main>
+
+    <!-- SEARCH MODAL -->
+    <div id="searchModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('searchModal')">&times;</span>
+            <h2 data-i18n="searchTitle">🔍 Search Products</h2>
+            <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Search for fishes, food, or accessories..." class="modal-input" data-i18n-placeholder="searchPlaceholder">
+            <div id="searchResults" class="search-results-grid"></div>
+        </div>
+    </div>
+
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
+            <h2 id="loginTitle" data-i18n="loginHeader">👤 Customer Log in</h2>
+            <form id="customerLoginForm" onsubmit="handleLogin(event)" autocomplete="on">
+                <input type="email" id="loginEmail" name="email" placeholder="Email Address" required class="modal-input" autocomplete="email" data-i18n-placeholder="emailPlaceholder">
+                <input type="password" id="loginPassword" name="password" placeholder="Password" required class="modal-input" autocomplete="current-password" data-i18n-placeholder="passPlaceholder">
+                <button type="submit" class="submit-btn" id="loginSubmitBtn" data-i18n="loginBtn">Log In</button>
+            </form>
+            <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">
+                <span data-i18n="noAccount">Don't have an account?</span> <a href="#" onclick="toggleAuthMode(event)" id="authToggleLink" style="color: #047857; font-weight: bold;" data-i18n="signUpText">Sign Up</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- PROFILE MODAL -->
+    <div id="accountModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close-btn" onclick="closeModal('accountModal')">&times;</span>
+            <div class="profile-header">
+                <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
+                <div>
+                    <h3 id="profileUserEmail" style="margin: 0; color: #064e3b;">user@email.com</h3>
+                    <p style="margin: 3px 0 0 0; color: #64748b; font-size: 0.85rem;" data-i18n="verifiedText">Verified Member</p>
+                </div>
+            </div>
+
+            <div class="customer-info-box" style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 10px 0; color: #064e3b; font-size: 0.95rem;" data-i18n="profileEditTitle">✏️ My Profile & Default Shipping Info:</h4>
+                <form id="profileEditForm" onsubmit="saveProfileDetails(event)">
+                    <div style="display: grid; gap: 8px;">
+                        <div>
+                            <label style="font-size: 0.82rem; font-weight: bold; color: #475569;" data-i18n="lblProfName">Full Name:</label>
+                            <input type="text" id="profNameInput" required class="modal-input" style="margin-top: 3px; margin-bottom: 8px; padding: 8px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.82rem; font-weight: bold; color: #475569;" data-i18n="lblProfContact">Contact Number:</label>
+                            <input type="text" id="profContactInput" maxlength="11" oninput="validateContact(this, 'profContactError')" required class="modal-input" style="margin-top: 3px; margin-bottom: 3px; padding: 8px;">
+                            <small id="profContactError" style="color: #dc2626; display: none; font-size: 0.75rem;" data-i18n="contactErrText">Dapat magsimula sa 09 at eksaktong 11 digits.</small>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.82rem; font-weight: bold; color: #475569;" data-i18n="lblProfAddress">Complete Delivery Address:</label>
+                            <input type="text" id="profAddressInput" placeholder="House No., Street, Barangay, City, Province" required class="modal-input" style="margin-top: 3px; margin-bottom: 8px; padding: 8px;">
+                        </div>
+                        <button type="submit" class="submit-btn" style="padding: 8px; font-size: 0.9rem; background: #047857;" data-i18n="btnSaveProfile">Save Profile Details</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="order-tabs">
+                <span class="order-tab active" onclick="filterOrderTab('all', this)" data-i18n="tabAll">All Orders</span>
+                <span class="order-tab" onclick="filterOrderTab('Pending', this)" data-i18n="tabPending">Pending</span>
+                <span class="order-tab" onclick="filterOrderTab('Shipping', this)" data-i18n="tabShip">To Ship</span>
+                <span class="order-tab" onclick="filterOrderTab('Completed', this)" data-i18n="tabCompleted">Completed</span>
+                <span class="order-tab" onclick="filterOrderTab('Refunded', this)" data-i18n="tabRefund">Refund</span>
+            </div>
+            <div id="userOrdersList" class="user-orders-container">
+                <p style="text-align: center; color: #64748b; padding: 20px;" data-i18n="noOrders">No order history found.</p>
+            </div>
+            <div style="margin-top: 20px; text-align: right; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                <button onclick="handleLogout()" class="remove-btn" style="padding: 10px 20px; font-size: 0.9rem;" data-i18n="logoutBtn">Log Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHOPPING CART MODAL -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close-btn" onclick="closeModal('cartModal')">&times;</span>
+            <h2 data-i18n="cartHeader">🛒 Your Shopping Cart</h2>
+            
+            <div id="cartItemsContainer">
+                <p style="font-size: 1.5rem; color: #475569; text-align: center; margin: 30px 0;" data-i18n="cartEmpty">Your cart is empty</p>
+            </div>
+
+            <div class="cart-summary-box" style="margin-top: 15px; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span data-i18n="lblSubtotal">Subtotal:</span>
+                    <strong>₱<span id="cartSubtotal">0.00</span></strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #2563eb;">
+                    <span data-i18n="lblShipping">Calculated Shipping Fee:</span>
+                    <strong>₱<span id="shippingFeeText">0.00</span></strong>
+                </div>
+                <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 8px 0;">
+                <div style="display: flex; justify-content: space-between; font-size: 1.2rem; color: #064e3b;">
+                    <span data-i18n="lblGrandTotal">Grand Total:</span>
+                    <strong>₱<span id="cartTotal">0.00</span></strong>
+                </div>
+            </div>
+
+            <div id="loginNoticeSection" class="login-notice-box" style="display: none;">
+                <button onclick="closeModal('cartModal')" class="continue-shopping-btn" data-i18n="btnContinue">Continue shopping</button>
+                <div style="margin-top: 20px;">
+                    <h3 style="margin-bottom: 5px; color: #334155;" data-i18n="haveAccount">Have an account?</h3>
+                    <p style="margin: 0; color: #64748b;">
+                        <a href="#" onclick="switchToLoginModal(event)" style="color: #2563eb; font-weight: bold; text-decoration: underline;" data-i18n="loginToCheckout">Log in</a> to check out faster.
+                    </p>
+                </div>
+            </div>
+
+            <!-- CHECKOUT FORM -->
+            <div class="checkout-form" id="checkoutSection" style="display: none; margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #a7f3d0; padding-bottom: 5px; margin-bottom: 12px;">
+                    <h3 style="color: #064e3b; margin: 0;" data-i18n="deliveryTitle">🚚 Delivery Address Details</h3>
+                    <button type="button" onclick="fillFromProfile()" class="use-profile-btn" data-i18n="btnUseProfile">📍 Use Profile Address</button>
+                </div>
+
+                <form id="deliveryForm" onsubmit="handlePlaceOrder(event)">
+                    <input type="text" id="custName" placeholder="Full Name" required class="modal-input" autocomplete="off" data-i18n-placeholder="namePlaceholder">
+                    
+                    <input type="text" id="custContact" placeholder="Contact Number (e.g. 09123456789)" maxlength="11" oninput="validateContact(this, 'checkoutContactError')" required class="modal-input" data-i18n-placeholder="contactPlaceholder">
+                    <small id="checkoutContactError" style="color: #dc2626; display: none; font-size: 0.8rem; margin-top: -8px; margin-bottom: 8px;" data-i18n="contactErrText">Dapat magsimula sa 09 at eksaktong 11 digits.</small>
+                    
+                    <label style="font-weight: bold; color: #064e3b; display: block; margin-top: 10px;" data-i18n="lblSelectProvince">Select Province:</label>
+                    <select id="custProvince" onchange="handleProvinceChange()" required class="modal-input">
+                        <option value="" disabled selected data-i18n="optSelectProv">-- Select Province (A-Z) --</option>
+                    </select>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label style="font-weight: bold; color: #064e3b; display: block; font-size: 0.85rem;" data-i18n="lblCity">City / Municipality:</label>
+                            <select id="custCity" onchange="handleCityChange()" required class="modal-input" disabled>
+                                <option value="" disabled selected data-i18n="optSelectCity">-- Select City / Town --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-weight: bold; color: #064e3b; display: block; font-size: 0.85rem;" data-i18n="lblBarangay">Barangay:</label>
+                            <select id="custBarangay" required class="modal-input" disabled>
+                                <option value="" disabled selected data-i18n="optSelectBgy">-- Select Barangay --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <input type="text" id="custAddress" placeholder="House No., Street Name, Phase / Subdivision / Landmark" required class="modal-input" data-i18n-placeholder="addressPlaceholder">
+                    
+                    <label style="margin-top: 10px; display: block; font-weight: bold; color: #064e3b;" data-i18n="lblPayment">Payment Method:</label>
+                    <select id="paymentMethod" onchange="togglePaymentMethod()" required class="modal-input">
+                        <option value="Cash on Delivery" data-i18n="optCod">Cash on Delivery (COD)</option>
+                        <option value="Online Payment" data-i18n="optOnline">Online Payment (GCash / PayMaya)</option>
+                    </select>
+
+                    <div id="qrCodeContainer" style="display: none; text-align: center; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; margin: 15px 0;">
+                        <p style="font-weight: bold; color: #064e3b; margin-bottom: 8px;" data-i18n="qrInstruction">Scan QR Code to Pay via GCash / PayMaya:</p>
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=AquaticHavenOfficialGCashPayment" alt="Payment QR Code" style="border-radius: 6px; border: 1px solid #cbd5e1;">
+                    </div>
+                    
+                    <button type="submit" class="checkout-btn" data-i18n="btnPlaceOrder">Place Order / Order Now</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS POPUP MODAL -->
+    <div id="successModal" class="modal" style="display: none;">
+        <div class="modal-content" style="text-align: center; max-width: 400px; animation: popIn 0.3s ease-out;">
+            <div style="font-size: 3.5rem; color: #16a34a; margin-bottom: 10px;">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h2 style="color: #064e3b; margin-bottom: 10px;" data-i18n="orderCompleteHeader">Order is Complete!</h2>
+            <p style="color: #475569; margin-bottom: 20px;" data-i18n="orderCompleteMsg">Maraming salamat! Ang iyong order ay matagumpay na naitala at pwedeng makita sa iyong Profile.</p>
+            <button onclick="closeSuccessModal()" class="submit-btn" style="background: #047857; font-size: 1rem; padding: 10px 20px;" data-i18n="btnOk">OK</button>
+        </div>
+    </div>
+
+    <footer id="contactSection">
+        <div style="margin-bottom: 15px;">
+            <h3 style="color: #fef08a; margin-bottom: 5px;" data-i18n="contactHeader">Contact Us</h3>
+            <p>📧 Email: support@aquatichaven.com | 📞 Phone: +63 912 345 6789</p>
+            <p>📍 Location: Metro Manila, Philippines</p>
+        </div>
+        <p>&copy; 2026 Aquatic Haven - Final Project. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Persistent Cart Load
+        let cart = JSON.parse(localStorage.getItem('aquatic_cart')) || [];
+        let allProducts = [];
+        let currentUser = JSON.parse(localStorage.getItem('aquatic_user')) || null;
+        let currentShippingFee = 0;
+        let userOrders = [];
+        let currentLang = localStorage.getItem('aquatic_lang') || 'EN';
+
+        const i18n = {
+            EN: {
+                navHome: "Home", navPlants: "Plants", navFishes: "Fishes", navFood: "Food & Medicine", navAccessories: "Accessories", navContact: "Contact",
+                heroTitle: "Premium Freshwater Life, Aquariums & Accessories", heroSub: "Your one-stop shop for healthy fishes and top-tier aquatic equipment",
+                secFishes: "🐟 Freshwater Fishes", secPlants: "🌱 Aquatic Plants", secFood: "🥫 Food & Medicine", secAccessories: "⚙️ Aquariums & Accessories",
+                searchTitle: "🔍 Search Products", loginHeader: "👤 Customer Log in", loginBtn: "Log In", noAccount: "Don't have an account?", signUpText: "Sign Up",
+                verifiedText: "Verified Member", profileEditTitle: "✏️ My Profile & Default Shipping Info:", lblProfName: "Full Name:", lblProfContact: "Contact Number:", lblProfAddress: "Complete Delivery Address:", btnSaveProfile: "Save Profile Details",
+                tabAll: "All Orders", tabPending: "Pending", tabShip: "To Ship", tabCompleted: "Completed", tabRefund: "Refund",
+                noOrders: "No order history found.", logoutBtn: "Log Out", cartHeader: "🛒 Your Shopping Cart", cartEmpty: "Your cart is empty",
+                lblSubtotal: "Subtotal:", lblShipping: "Calculated Shipping Fee:", lblGrandTotal: "Grand Total:", btnContinue: "Continue shopping",
+                haveAccount: "Have an account?", loginToCheckout: "Log in", deliveryTitle: "🚚 Delivery Address Details", btnUseProfile: "📍 Use Profile Address", contactErrText: "Must start with 09 and be exactly 11 digits.",
+                lblSelectProvince: "Select Province:", lblCity: "City / Municipality:", lblBarangay: "Barangay:", lblPayment: "Payment Method:",
+                optSelectProv: "-- Select Province (A-Z) --", optSelectCity: "-- Select City / Town --", optSelectBgy: "-- Select Barangay --",
+                optCod: "Cash on Delivery (COD)", optOnline: "Online Payment (GCash / PayMaya)",
+                qrInstruction: "Scan QR Code to Pay via GCash / PayMaya:", btnPlaceOrder: "Place Order / Order Now",
+                orderCompleteHeader: "Order is Complete!", orderCompleteMsg: "Thank you! Your order has been successfully placed and can be viewed in your Profile.",
+                btnOk: "OK", contactHeader: "Contact Us",
+                searchPlaceholder: "Search for fishes, food, or accessories...", emailPlaceholder: "Email Address", passPlaceholder: "Password",
+                namePlaceholder: "Full Name", contactPlaceholder: "Contact Number (e.g. 09123456789)", addressPlaceholder: "House No., Street Name, Phase / Subdivision / Landmark"
+            },
+            TAG: {
+                navHome: "Tahanan", navPlants: "Halaman", navFishes: "Isda", navFood: "Pagkain at Gamot", navAccessories: "Kagamitan", navContact: "Pormularyo",
+                heroTitle: "Mataas na Kalidad ng Isda, Akwaryum at Kagamitan", heroSub: "Ang iyong paboritong online pet shop para sa malusog na mga isda",
+                secFishes: "🐟 Mga Isdang Matabang-Tubig", secPlants: "🌱 Mga Halamang-Tubig", secFood: "🥫 Pagkain at Gamot", secAccessories: "⚙️ Akwaryum at Kagamitan",
+                searchTitle: "🔍 Maghanap ng Produkto", loginHeader: "👤 Mag-Log in bilang Customer", loginBtn: "Pumasok (Log In)", noAccount: "Wala pang account?", signUpText: "Mag-sign Up",
+                verifiedText: "Kumpirmadong Miyembro", profileEditTitle: "✏️ Impormasyon ng Profile at Tirahan:", lblProfName: "Buong Pangalan:", lblProfContact: "Contact Number:", lblProfAddress: "Kumpletong Tirahan (Address):", btnSaveProfile: "I-save ang Profile",
+                tabAll: "Lahat ng Order", tabPending: "Naka-pending", tabShip: "Ipapadala", tabCompleted: "Kumpleto Na", tabRefund: "Ipa-Refund",
+                noOrders: "Walang nakatagong history ng order.", logoutBtn: "Lumabas (Log Out)", cartHeader: "🛒 Iyong Shopping Cart", cartEmpty: "Walang laman ang iyong cart",
+                lblSubtotal: "Kabuuan ng Produkto:", lblShipping: "Bayad sa Pagpapadala (Shipping):", lblGrandTotal: "Pangkalahatang Bayarin:", btnContinue: "Magpatuloy sa Pagbili",
+                haveAccount: "May account ka na?", loginToCheckout: "Mag-login", deliveryTitle: "🚚 Detalye ng Tirahan at Pagpapadala", btnUseProfile: "📍 Gamitin ang Profile Address", contactErrText: "Dapat magsimula sa 09 at may 11 numero.",
+                lblSelectProvince: "Pumili ng Lalawigan (Province):", lblCity: "Bayan / Lungsod:", lblBarangay: "Barangay:", lblPayment: "Paraan ng Pagbabayad:",
+                optSelectProv: "-- Pumili ng Lalawigan (A-Z) --", optSelectCity: "-- Pumili ng Bayan / Lungsod --", optSelectBgy: "-- Pumili ng Barangay --",
+                optCod: "Cash on Delivery (COD)", optOnline: "Online Payment (GCash / PayMaya)",
+                qrInstruction: "I-scan ang QR Code para magbayad gamit ang GCash / PayMaya:", btnPlaceOrder: "I-place ang Order Ngayon",
+                orderCompleteHeader: "Kumpleto na ang Order!", orderCompleteMsg: "Maraming salamat! Ang iyong order ay matagumpay na naitala at makikita sa iyong Profile.",
+                btnOk: "OK", contactHeader: "Makipag-ugnayan",
+                searchPlaceholder: "Maghanap ng isda, pagkain, o kagamitan...", emailPlaceholder: "Email Address", passPlaceholder: "Password",
+                namePlaceholder: "Buong Pangalan", contactPlaceholder: "Contact Number (hal. 09123456789)", addressPlaceholder: "House No., Street Name, Phase / Subdivision / Landmark"
+            }
+        };
+
+        function applyLanguage() {
+            document.getElementById('langText').innerText = currentLang === 'EN' ? 'Tagalog' : 'English';
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) {
+                    el.innerText = i18n[currentLang][key];
+                }
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (i18n[currentLang][key]) {
+                    el.placeholder = i18n[currentLang][key];
+                }
+            });
+            renderCart();
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'EN' ? 'TAG' : 'EN';
+            localStorage.setItem('aquatic_lang', currentLang);
+            applyLanguage();
+        }
+
+        const provincesDB = {
+            "ABRA": {
+                region: "Luzon",
+                cities: {
+                    "Bangued": ["Angad", "Calaba", "Poblacion", "San Antonio", "Sao-atan"],
+                    "Boliney": ["Amti", "Baay", "Dumagas", "Kilong-Ola", "Poblacion"],
+                    "Bucay": ["Bangcagan", "Bangcal", "Abang", "Quimloong", "Poblacion", "Tala"],
+                    "Bucloc": ["Labaan", "Lenneng", "Poblacion"],
+                    "Daguioman": ["Abang", "Cabaruyan", "Tui", "Poblacion"],
+                    "Danglas": ["Abaquid", "Cabaruan", "Nagaparan", "Poblacion"],
+                    "Dolores": ["Bayaan", "Isio", "Mudiit", "Poblacion", "Salucag"],
+                    "La Paz": ["Buli", "Lacca", "Liguud", "Poblacion", "Vira"],
+                    "Lacub": ["Bannawag", "Buyogan", "Poblacion", "Wangi"],
+                    "Lagangilang": ["Belleza", "Cayapa", "Nagtipulan", "Poblacion", "Taping"],
+                    "Lagayan": ["Collago", "Poblacion", "Purbance"],
+                    "Langiden": ["Baac", "Longcog", "Malo", "Poblacion"],
+                    "Licuan-Baay": ["Bonglo", "Caganayan", "Poblacion", "Subusob"],
+                    "Luba": ["Ampalioc", "Barit", "Gayaman", "Poblacion"],
+                    "Malibcong": ["Buanao", "Dulao", "Gacab", "Poblacion", "Ulayoc"],
+                    "Manabo": ["Catacdegan", "Luzong", "Poblacion", "San Jose"],
+                    "Peñarrubia": ["Lusuac", "Malamsit", "Poblacion", "Taping"],
+                    "Pidigan": ["Animation", "Negro", "Poblacion", "San Diego"],
+                    "Pilar": ["Ocup", "Poblacion", "San Juan", "Vical"],
+                    "Sallapadan": ["Bigas", "Maguyepyep", "Poblacion", "Sappa"],
+                    "San Isidro": ["Langbacan", "Poblacion", "San Antonio"],
+                    "San Juan": ["Abualan", "Camanang", "Poblacion", "Quillnat"],
+                    "San Quintin": ["Labaan", "Poblacion", "Tangadan"],
+                    "Tayum": ["Bagalay", "Deet", "Poblacion", "Vasia"],
+                    "Tineg": ["Alaoa", "Caganayan", "Poblacion"],
+                    "Tubo": ["Alangued", "Amtao", "Poblacion", "Tubtub"],
+                    "Villaviciosa": ["Ap-apaya", "Bol-o", "Poblacion", "Tamac"]
+                }
+            },
+            "AGUSAN DEL NORTE": { region: "Mindanao", cities: { "Butuan City": ["Bayanihan", "Poblacion", "San Vicente"], "Cabadbaran City": ["Puting Bato", "Poblacion"] } },
+            "AGUSAN DEL SUR": { region: "Mindanao", cities: { "Bayugan City": ["Poblacion", "Taglatawan"], "San Francisco": ["Alegria", "Poblacion"] } },
+            "AKLAN": { region: "Visayas", cities: { "Kalibo": ["Andagao", "Poblacion"], "Malay (Boracay)": ["Balabag", "Manoc-Manoc", "Yapak"] } },
+            "ALBAY": { region: "Luzon", cities: { "Daraga": ["Binitayan", "Poblacion"], "Legazpi City": ["Poblacion", "Rawis"] } },
+            "ANTIQUE": { region: "Visayas", cities: { "San Jose de Buenavista": ["Atabay", "Poblacion"] } },
+            "APAYAO": { region: "Luzon", cities: { "Conner": ["Buluan", "Poblacion"], "Kabugao": ["Poblacion"] } },
+            "AURORA": { region: "Luzon", cities: { "Baler": ["Poblacion", "Sabang"], "Maria Aurora": ["Poblacion"] } },
+            "BASILAN": { region: "Mindanao", cities: { "Isabela City": ["Poblacion", "Tabuk"], "Lamitan City": ["Poblacion"] } },
+            "BATAAN": { region: "Luzon", cities: { "Balanga City": ["Poblacion", "Tenejero"], "Dinalupihan": ["Poblacion"], "Mariveles": ["Alas-asin", "Poblacion"] } },
+            "BATANES": { region: "Luzon", cities: { "Basco": ["Kayvaluganan", "Poblacion"] } },
+            "BATANGAS": { region: "Luzon", cities: { "Batangas City": ["Kumintang Ilaya", "Poblacion"], "Lipa City": ["Poblacion", "Sabang"], "Tanauan City": ["Poblacion"] } },
+            "BENGUET": { region: "Luzon", cities: { "Baguio City": ["Burnham Park", "Camp John Hay", "Irisan", "Loakan", "Session Road Area"], "La Trinidad": ["Pico", "Poblacion"] } },
+            "BILIRAN": { region: "Visayas", cities: { "Naval": ["Atipolo", "Poblacion"] } },
+            "BOHOL": { region: "Visayas", cities: { "Panglao": ["Poblacion", "Tawala"], "Tagbilaran City": ["Cogon", "Dampas", "Poblacion"] } },
+            "BUKIDNON": { region: "Mindanao", cities: { "Malaybalay City": ["Poblacion", "Sumpong"], "Valencia City": ["Poblacion"] } },
+            "BULACAN": { region: "Luzon", cities: { "Baliwag City": ["Poblacion"], "Malolos City": ["Catmon", "Guinhawa"], "Marilao": ["Ibayo", "Lias"], "Meycauayan City": ["Banga", "Lawa"] } },
+            "CAGAYAN": { region: "Luzon", cities: { "Tuguegarao City": ["Carig", "Poblacion"] } },
+            "CAMARINES NORTE": { region: "Luzon", cities: { "Daet": ["Camambugan", "Poblacion"] } },
+            "CAMARINES SUR": { region: "Luzon", cities: { "Iriga City": ["Poblacion"], "Naga City": ["Concepcion Pequeña", "Poblacion"] } },
+            "CAMIGUIN": { region: "Mindanao", cities: { "Mambajao": ["Poblacion"] } },
+            "CAPIZ": { region: "Visayas", cities: { "Roxas City": ["Baybay", "Poblacion"] } },
+            "CATANDUANES": { region: "Luzon", cities: { "Virac": ["Poblacion", "San Roque"] } },
+            "CAVITE": { region: "Luzon", cities: { "Bacoor City": ["Molino I", "Molino II"], "Dasmarinas City": ["Paliparan", "Salawag"], "Imus City": ["Anabu", "Bucandala"], "Tagaytay City": ["Poblacion"] } },
+            "CEBU": { region: "Visayas", cities: { "Cebu City": ["Ayala Center", "Colon", "IT Park", "Lahug", "Mabolo"], "Lapu-Lapu City": ["Basak", "Mactan"], "Mandaue City": ["Banilad", "Tipolo"] } },
+            "COTABATO": { region: "Mindanao", cities: { "Kidapawan City": ["Lanao", "Poblacion"] } },
+            "DAVAO DE ORO": { region: "Mindanao", cities: { "Nabunturan": ["Poblacion"] } },
+            "DAVAO DEL NORTE": { region: "Mindanao", cities: { "Panabo City": ["Poblacion"], "Tagum City": ["Poblacion"] } },
+            "DAVAO DEL SUR": { region: "Mindanao", cities: { "Davao City": ["Agdao", "Buhangin", "Lanang", "Matina", "Poblacion", "Talomo", "Toril"], "Digos City": ["Poblacion"] } },
+            "DAVAO OCCIDENTAL": { region: "Mindanao", cities: { "Malita": ["Poblacion"] } },
+            "DAVAO ORIENTAL": { region: "Mindanao", cities: { "Mati City": ["Central", "Poblacion"] } },
+            "DINAGAT ISLANDS": { region: "Mindanao", cities: { "San Jose": ["Poblacion"] } },
+            "EASTERN SAMAR": { region: "Visayas", cities: { "Borongan City": ["Poblacion"] } },
+            "GUIMARAS": { region: "Visayas", cities: { "Jordan": ["Poblacion"] } },
+            "IFUGAO": { region: "Luzon", cities: { "Banaue": ["Poblacion", "Tam-an"], "Lagawe": ["Poblacion"] } },
+            "ILOCOS NORTE": { region: "Luzon", cities: { "Batac City": ["Poblacion"], "Laoag City": ["Poblacion", "San Guillermo"] } },
+            "ILOCOS SUR": { region: "Luzon", cities: { "Candon City": ["Poblacion"], "Vigan City": ["Pantay", "Poblacion"] } },
+            "ILOILO": { region: "Visayas", cities: { "Iloilo City": ["Jaro", "La Paz", "Mandurriao", "Molo"], "Passi City": ["Poblacion"] } },
+            "ISABELA": { region: "Luzon", cities: { "Cauayan City": ["Poblacion"], "Ilagan City": ["Poblacion"], "Santiago City": ["Poblacion"] } },
+            "KALINGA": { region: "Luzon", cities: { "Tabuk City": ["Dagupan", "Poblacion"] } },
+            "LA UNION": { region: "Luzon", cities: { "San Fernando City": ["Poblacion", "Sevilla"] } },
+            "LAGUNA": { region: "Luzon", cities: { "Biñan City": ["Poblacion"], "Calamba City": ["Canlubang", "Real"], "Santa Rosa City": ["Balibago", "Don Jose"] } },
+            "LANAO DEL NORTE": { region: "Mindanao", cities: { "Iligan City": ["Poblacion", "Tubod"] } },
+            "LANAO DEL SUR": { region: "Mindanao", cities: { "Marawi City": ["Poblacion"] } },
+            "LEYTE": { region: "Visayas", cities: { "Ormoc City": ["Poblacion"], "Tacloban City": ["Poblacion", "San Jose"] } },
+            "MAGUINDANAO": { region: "Mindanao", cities: { "Cotabato City": ["Poblacion", "Rosary Heights"] } },
+            "METRO MANILA (NCR)": { region: "Luzon", cities: { "Makati City": ["Bel-Air", "Poblacion"], "Manila City": ["Binondo", "Ermita", "Malate", "Sampaloc", "Tondo"], "Quezon City": ["Commonwealth", "Cubao", "Diliman", "Novaliches"], "Taguig City": ["BGC", "Ususan"] } },
+            "PAMPANGA": {
+                region: "Luzon",
+                cities: {
+                    "Angeles City": ["Anunas", "Balibago", "Claro M. Recto", "Cutcut", "Malabanias", "Pampang", "Pulung Maragul", "Sapangbato", "Sto. Domingo", "Sto. Rosario"],
+                    "Apalit": ["Capunpunan", "San Juan", "San Vicente", "Sulipan", "Tabuyuc"],
+                    "Arayat": ["Cacutud", "Plazang Luma", "Poblacion", "San Agustin Norte", "San Juan"],
+                    "Bacolor": ["Cabalantian", "Cabambangan", "Magliman", "Santa Ines", "San Vicente"],
+                    "Candaba": ["Bahay Pare", "Pasig", "Poblacion", "Salapungan", "Tagulod"],
+                    "City of San Fernando": ["Calulut", "Dolores", "Lourdes", "Maimpis", "Quebiawan", "San Agustin", "San Francisco", "San Jose", "San Nicolas", "Telebastagan"],
+                    "Floridablanca": ["Calabitam", "Paguiruan", "Poblacion", "San Jose", "Valdez"],
+                    "Guagua": ["Plaza Burgos", "Pulungmasle", "San Matias", "San Pedro", "San Rafael", "Siran"],
+                    "Lubao": ["Prado Siongco", "Remedios", "San Jose Gumi", "San Nicolas", "Sta. Cruz"],
+                    "Mabalacat City": ["Atlu-Bola", "Bical", "Camachiles", "Dau", "Duquit", "Lakandula", "Mabalacat Poblacion", "Mabangcal", "San Francisco", "Santa Ines"],
+                    "Macabebe": ["Caduang Tete", "Poblacion", "San Gabriel", "San Jose", "Sta. Maria"],
+                    "Magalang": ["Poblacion", "San Pedro 1st", "San Pedro 2nd", "Sta. Cruz", "Turu"],
+                    "Masantol": ["Nigui", "Poblacion", "San Nicolas", "Sta. Cruz", "Sua"],
+                    "Mexico": ["Arayat Border", "Divisoria", "Lagundi", "Panipuan", "Parian", "San Jose Malino", "San Nicolas"],
+                    "Minalin": ["Lourdes", "San Nicolas", "San Pedro", "Sta. Maria", "Sta. Rita"],
+                    "Porac": ["Babo Sacan", "Cangatba", "Manibaug Libutad", "Manibaug Paralaya", "Poblacion"],
+                    "San Luis": ["Poblacion", "San Jose", "San Nicolas", "Santa Cruz"],
+                    "San Simon": ["Poblacion", "San Agustin", "San Isidro", "San Jose", "San Miguel", "San Nicolas", "San Pedro"],
+                    "Santa Rita": ["Becuran", "Dila Dila", "Poblacion", "San Juan", "San Matias"],
+                    "Santo Tomas": ["Poblacion", "San Bartolome", "San Matias", "San Vicente"],
+                    "Sasmuan": ["Poblacion", "San Nicolas 1st", "Santa Lucia", "Santo Tomas"]
+                }
+            },
+            "ZAMBOANGA DEL SUR": { region: "Mindanao", cities: { "ZAMBOANGA CITY": ["Baliwasan", "Calarian", "Putik", "Sta. Maria", "Tetuan"] } }
+        };
+
+        function initProvinces() {
+            const provSelect = document.getElementById('custProvince');
+            if(!provSelect) return;
+            provSelect.innerHTML = `<option value="" disabled selected data-i18n="optSelectProv">${i18n[currentLang].optSelectProv}</option>`;
+            const sortedKeys = Object.keys(provincesDB).sort();
+            sortedKeys.forEach(prov => {
+                const opt = document.createElement('option');
+                opt.value = prov;
+                opt.textContent = prov;
+                provSelect.appendChild(opt);
+            });
+        }
+
+        function validateContact(input, errId) {
+            let val = input.value.replace(/\D/g, '');
+            if (val.length > 11) val = val.slice(0, 11);
+            input.value = val;
+
+            const err = document.getElementById(errId);
+            if (val.length > 0 && (!val.startsWith('09') || val.length !== 11)) {
+                if (err) err.style.display = 'block';
+                input.style.borderColor = '#dc2626';
+            } else {
+                if (err) err.style.display = 'none';
+                input.style.borderColor = '#cbd5e1';
+            }
+        }
+
+        function handleProvinceChange() {
+            const provValue = document.getElementById('custProvince').value;
+            const citySelect = document.getElementById('custCity');
+            const barangaySelect = document.getElementById('custBarangay');
+
+            citySelect.innerHTML = `<option value="" disabled selected data-i18n="optSelectCity">${i18n[currentLang].optSelectCity}</option>`;
+            barangaySelect.innerHTML = `<option value="" disabled selected data-i18n="optSelectBgy">${i18n[currentLang].optSelectBgy}</option>`;
+
+            citySelect.disabled = false;
+            barangaySelect.disabled = true;
+
+            if (provincesDB[provValue]) {
+                const reg = provincesDB[provValue].region;
+                if (reg === 'Luzon') currentShippingFee = 80;
+                else if (reg === 'Visayas') currentShippingFee = 150;
+                else if (reg === 'Mindanao') currentShippingFee = 200;
+
+                document.getElementById('shippingFeeText').innerText = currentShippingFee.toFixed(2);
+                renderCart();
+
+                const sortedCities = Object.keys(provincesDB[provValue].cities).sort();
+                sortedCities.forEach(city => {
+                    const opt = document.createElement('option');
+                    opt.value = city;
+                    opt.textContent = city;
+                    citySelect.appendChild(opt);
+                });
+            }
+        }
+
+        function handleCityChange() {
+            const provValue = document.getElementById('custProvince').value;
+            const cityValue = document.getElementById('custCity').value;
+            const barangaySelect = document.getElementById('custBarangay');
+
+            barangaySelect.innerHTML = `<option value="" disabled selected data-i18n="optSelectBgy">${i18n[currentLang].optSelectBgy}</option>`;
+            barangaySelect.disabled = false;
+
+            if (provincesDB[provValue] && provincesDB[provValue].cities[cityValue]) {
+                const sortedBgys = [...provincesDB[provValue].cities[cityValue]].sort();
+                sortedBgys.forEach(bgy => {
+                    const opt = document.createElement('option');
+                    opt.value = bgy;
+                    opt.textContent = bgy;
+                    barangaySelect.appendChild(opt);
+                });
+            }
+        }
+
+        function togglePaymentMethod() {
+            const method = document.getElementById('paymentMethod').value;
+            const qrBox = document.getElementById('qrCodeContainer');
+            if (method === 'Online Payment') {
+                qrBox.style.display = 'block';
+            } else {
+                qrBox.style.display = 'none';
+            }
+        }
+
+        async function fetchProducts() {
+            try {
+                const response = await fetch('/api/products');
+                allProducts = await response.json();
+                renderCatalog(allProducts);
+            } catch (err) {
+                console.error('Error fetching products:', err);
+            }
+        }
+
+        function renderCatalog(products) {
+            const fishList = document.getElementById('fishList');
+            const plantsList = document.getElementById('plantsList');
+            const accessoriesList = document.getElementById('accessoriesList');
+            const foodList = document.getElementById('foodList');
+
+            if (fishList) fishList.innerHTML = '';
+            if (plantsList) plantsList.innerHTML = '';
+            if (accessoriesList) accessoriesList.innerHTML = '';
+            if (foodList) foodList.innerHTML = '';
+
+            products.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${p.image}" alt="${p.name}">
+                    <div class="card-body">
+                        <span class="tag">${p.category}</span>
+                        <h3>${p.name}</h3>
+                        <p class="price">₱${p.price.toFixed(2)}</p>
+                        <button onclick="addToCart('${p.name}', ${p.price}, event)" class="add-cart-btn">${currentLang === 'EN' ? 'Add to Cart' : 'Ilagay sa Cart'}</button>
+                    </div>
+                `;
+
+                if ((p.category === 'Fishes' || p.category === 'Fish') && fishList) {
+                    fishList.appendChild(card);
+                } else if (p.category === 'Plants' && plantsList) {
+                    plantsList.appendChild(card);
+                } else if (p.category === 'Accessories' && accessoriesList) {
+                    accessoriesList.appendChild(card);
+                } else if (p.category === 'Food' && foodList) {
+                    foodList.appendChild(card);
+                }
+            });
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = "flex";
+            if (modalId === 'cartModal') {
+                renderCart();
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        function checkUserAndOpenModal() {
+            if (currentUser) {
+                document.getElementById('profileUserEmail').innerText = currentUser.email;
+                document.getElementById('profNameInput').value = currentUser.name || "";
+                document.getElementById('profContactInput').value = currentUser.contact || "";
+                document.getElementById('profAddressInput').value = currentUser.address || "";
+                fetchUserOrders();
+                openModal('accountModal');
+            } else {
+                openModal('loginModal');
+            }
+        }
+
+        function saveProfileDetails(e) {
+            e.preventDefault();
+            const name = document.getElementById('profNameInput').value;
+            const contact = document.getElementById('profContactInput').value;
+            const address = document.getElementById('profAddressInput').value;
+
+            if (!contact.startsWith('09') || contact.length !== 11) {
+                return;
+            }
+
+            currentUser.name = name;
+            currentUser.contact = contact;
+            currentUser.address = address;
+
+            localStorage.setItem('aquatic_user', JSON.stringify(currentUser));
+            closeModal('accountModal');
+        }
+
+        function fillFromProfile() {
+            if (!currentUser) return;
+            if (currentUser.name) document.getElementById('custName').value = currentUser.name;
+            if (currentUser.contact) document.getElementById('custContact').value = currentUser.contact;
+            if (currentUser.address) document.getElementById('custAddress').value = currentUser.address;
+        }
+
+        function switchToLoginModal(e) {
+            e.preventDefault();
+            closeModal('cartModal');
+            openModal('loginModal');
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const resultsContainer = document.getElementById('searchResults');
+            resultsContainer.innerHTML = '';
+
+            if (query.trim() === '') return;
+
+            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query));
+
+            filtered.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'search-item-card';
+                div.innerHTML = `
+                    <img src="${p.image}" alt="${p.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                    <div style="flex-grow: 1; padding-left: 10px;">
+                        <strong>${p.name}</strong>
+                        <div>₱${p.price.toFixed(2)}</div>
+                    </div>
+                    <button onclick="addToCart('${p.name}', ${p.price}, event)" class="add-cart-btn" style="padding: 5px 10px;">+ Cart</button>
+                `;
+                resultsContainer.appendChild(div);
+            });
+        }
+
+        // SMOOTH FLY TO CART ANIMATION & NO ALERTS
+        function addToCart(name, price, event) {
+            cart.push({ name, price });
+            localStorage.setItem('aquatic_cart', JSON.stringify(cart));
+            updateCartBadge();
+            renderCart();
+
+            // Trigger Animation if event exists
+            if (event && event.clientX && event.clientY) {
+                const cartBtn = document.getElementById('cartIconButton');
+                const cartRect = cartBtn.getBoundingClientRect();
+
+                const flyer = document.createElement('div');
+                flyer.className = 'fly-to-cart';
+                flyer.style.left = `${event.clientX}px`;
+                flyer.style.top = `${event.clientY}px`;
+                document.body.appendChild(flyer);
+
+                setTimeout(() => {
+                    flyer.style.left = `${cartRect.left + 15}px`;
+                    flyer.style.top = `${cartRect.top + 15}px`;
+                    flyer.style.opacity = '0.3';
+                    flyer.style.transform = 'scale(0.2)';
+                }, 20);
+
+                setTimeout(() => {
+                    flyer.remove();
+                    cartBtn.classList.add('bounce');
+                    setTimeout(() => cartBtn.classList.remove('bounce'), 400);
+                }, 600);
+            }
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cartCountBadge');
+            if (badge) {
+                badge.innerText = cart.length;
+            }
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cartItemsContainer');
+            const subtotalSpan = document.getElementById('cartSubtotal');
+            const totalSpan = document.getElementById('cartTotal');
+            const checkoutSection = document.getElementById('checkoutSection');
+            const loginNoticeSection = document.getElementById('loginNoticeSection');
+
+            if (!container) return;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p style="font-size: 1.5rem; color: #475569; text-align: center; margin: 30px 0;" data-i18n="cartEmpty">${i18n[currentLang].cartEmpty}</p>`;
+                if (subtotalSpan) subtotalSpan.innerText = "0.00";
+                if (totalSpan) totalSpan.innerText = "0.00";
+                if (checkoutSection) checkoutSection.style.display = "none";
+                if (loginNoticeSection) loginNoticeSection.style.display = currentUser ? "none" : "block";
+                return;
+            }
+
+            container.innerHTML = '';
+            let subtotal = 0;
+
+            cart.forEach((item, index) => {
+                subtotal += item.price;
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <span>${item.name} - ₱${item.price.toFixed(2)}</span>
+                    <button onclick="removeFromCart(${index})" class="remove-btn">X</button>
+                `;
+                container.appendChild(div);
+            });
+
+            if (subtotalSpan) subtotalSpan.innerText = subtotal.toFixed(2);
+            const grandTotal = subtotal + currentShippingFee;
+            if (totalSpan) totalSpan.innerText = grandTotal.toFixed(2);
+
+            if (currentUser) {
+                if (checkoutSection) checkoutSection.style.display = "block";
+                if (loginNoticeSection) loginNoticeSection.style.display = "none";
+            } else {
+                if (checkoutSection) checkoutSection.style.display = "none";
+                if (loginNoticeSection) loginNoticeSection.style.display = "block";
+            }
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            localStorage.setItem('aquatic_cart', JSON.stringify(cart));
+            updateCartBadge();
+            renderCart();
+        }
+
+        let isSignUp = false;
+        function toggleAuthMode(e) {
+            e.preventDefault();
+            isSignUp = !isSignUp;
+            document.getElementById('loginTitle').innerText = isSignUp ? (currentLang === 'EN' ? '👤 Customer Sign Up' : '👤 Mag-sign Up') : (currentLang === 'EN' ? '👤 Customer Log in' : '👤 Mag-log in');
+            document.getElementById('loginSubmitBtn').innerText = isSignUp ? (currentLang === 'EN' ? 'Create Account' : 'Gumawa ng Account') : (currentLang === 'EN' ? 'Log In' : 'Pumasok');
+            document.getElementById('authToggleLink').innerText = isSignUp ? (currentLang === 'EN' ? 'Log In' : 'Mag-log in') : (currentLang === 'EN' ? 'Sign Up' : 'Mag-sign Up');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            currentUser = { email, name: "", contact: "", address: "" };
+            
+            localStorage.setItem('aquatic_user', JSON.stringify(currentUser));
+            document.getElementById('userLoggedInStatus').style.display = "inline";
+            closeModal('loginModal');
+            renderCart();
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            localStorage.removeItem('aquatic_user');
+            document.getElementById('userLoggedInStatus').style.display = "none";
+            document.getElementById('customerLoginForm').reset();
+            closeModal('accountModal');
+            renderCart();
+        }
+
+        async function fetchUserOrders() {
+            if (!currentUser) return;
+            try {
+                const res = await fetch(`/api/orders?email=${encodeURIComponent(currentUser.email)}`);
+                userOrders = await res.json();
+                renderUserOrders(userOrders);
+            } catch (err) {
+                console.error("Error fetching user orders:", err);
+            }
+        }
+
+        function renderUserOrders(orders) {
+            const container = document.getElementById('userOrdersList');
+            if (!orders || orders.length === 0) {
+                container.innerHTML = `<p style="text-align: center; color: #64748b; padding: 20px;" data-i18n="noOrders">${i18n[currentLang].noOrders}</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            orders.forEach(o => {
+                const statusColor = o.status === 'Completed' ? '#16a34a' : o.status === 'Refunded' ? '#dc2626' : o.status === 'Shipping' ? '#2563eb' : '#d97706';
+                const div = document.createElement('div');
+                div.className = 'order-card';
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; margin-bottom: 8px;">
+                        <strong>Order #${o.orderId}</strong>
+                        <span style="color: ${statusColor}; font-weight: bold;">${o.status || 'Pending'}</span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: #475569; margin-bottom: 6px;">
+                        Items: ${o.items.map(i => i.name).join(', ')}
+                    </div>
+                    <div style="font-size: 0.82rem; color: #334155; margin-bottom: 6px;">
+                        📍 ${o.address}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; margin-top: 8px;">
+                        <div>Total: <strong style="color: #064e3b;">₱${o.totalPrice.toFixed(2)}</strong> (${o.paymentMethod})</div>
+                        ${o.status !== 'Refunded' ? `<button onclick="requestRefund(${o.orderId})" style="background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">${currentLang === 'EN' ? 'Request Refund' : 'Humiling ng Refund'}</button>` : `<span style="font-size: 0.8rem; color: #dc2626;">${currentLang === 'EN' ? 'Refund Requested' : 'May Kahilingan sa Refund'}</span>`}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function filterOrderTab(status, element) {
+            document.querySelectorAll('.order-tab').forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+
+            if (status === 'all') {
+                renderUserOrders(userOrders);
+            } else {
+                const filtered = userOrders.filter(o => (o.status || 'Pending') === status);
+                renderUserOrders(filtered);
+            }
+        }
+
+        async function requestRefund(orderId) {
+            await fetch(`/api/orders/${orderId}/refund`, { method: 'POST' });
+            fetchUserOrders();
+        }
+
+        async function handlePlaceOrder(e) {
+            e.preventDefault();
+            const contact = document.getElementById('custContact').value;
+            if (!contact.startsWith('09') || contact.length !== 11) {
+                return;
+            }
+
+            const name = document.getElementById('custName').value;
+            const province = document.getElementById('custProvince').value;
+            const city = document.getElementById('custCity').value;
+            const barangay = document.getElementById('custBarangay').value;
+            const streetAddress = document.getElementById('custAddress').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const totalPrice = parseFloat(document.getElementById('cartTotal').innerText);
+
+            const fullAddress = `${streetAddress}, Brgy. ${barangay}, ${city}, ${province}`;
+
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    name, 
+                    email: currentUser ? currentUser.email : "guest@aquatichaven.com",
+                    address: fullAddress, 
+                    contact, 
+                    paymentMethod, 
+                    cartItems: cart, 
+                    shippingFee: currentShippingFee,
+                    totalPrice 
+                })
+            });
+
+            if (response.ok) {
+                cart = [];
+                localStorage.removeItem('aquatic_cart');
+                updateCartBadge();
+                renderCart();
+                document.getElementById('deliveryForm').reset();
+                closeModal('cartModal');
+                
+                openModal('successModal');
+            }
+        }
+
+        function closeSuccessModal() {
+            closeModal('successModal');
+        }
+
+        if (currentUser) {
+            document.getElementById('userLoggedInStatus').style.display = "inline";
+        }
+
+        initProvinces();
+        fetchProducts();
+        updateCartBadge();
+        renderCart();
+        applyLanguage();
+    </script>
+</body>
+</html>
