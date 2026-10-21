@@ -31,18 +31,23 @@
             </div>
             <a href="#contactSection" class="nav-item" data-i18n="navContact">Contact</a>
         </nav>
-
         <div class="nav-icons">
             <button onclick="toggleLanguage()" class="lang-btn" id="langBtn" title="Switch Language">
                 🌐 <span id="langText">Tagalog</span>
             </button>
-
             <button class="icon-btn" onclick="openModal('searchModal')" title="Search">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
+            
+            <!-- CUSTOMER LOGIN ICON -->
             <button class="icon-btn" onclick="checkUserAndOpenModal()" title="Customer Account">
                 <i class="fa-regular fa-user"></i>
                 <span id="userLoggedInStatus" style="font-size: 0.7rem; color: #4ade80; display: none;">●</span>
+            </button>
+            <!-- SEPARATE ADMIN LOGIN ICON -->
+            <button class="icon-btn admin-key-btn" onclick="openAdminLoginModal()" title="Admin Login Desk">
+                <i class="fa-solid fa-key" style="color: #fef08a;"></i>
+                <span id="adminLoggedInStatus" style="font-size: 0.7rem; color: #f59e0b; display: none;">●</span>
             </button>
             <button class="icon-btn cart-icon-btn" id="cartIconButton" onclick="openModal('cartModal')" title="Shopping Cart">
                 <i class="fa-solid fa-bag-shopping"></i>
@@ -50,12 +55,33 @@
             </button>
         </div>
     </header>
-
+    <!-- ADMIN MANAGEMENT DASHBOARD PANEL -->
+    <section id="adminDashboard" class="admin-panel" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h2 style="color: #064e3b; margin: 0;">👑 Admin Management Dashboard</h2>
+            <button onclick="handleLogout()" class="remove-btn" style="padding: 6px 14px;">Logout Admin</button>
+        </div>
+        <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #a7f3d0;">
+            <h3 style="margin-bottom: 10px; color: #047857;">➕ Add New Item to Catalog</h3>
+            <form id="adminAddForm" onsubmit="handleAdminAddProduct(event)" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                <input type="text" id="adminItemName" placeholder="Product Name" required class="modal-input" style="flex: 1; min-width: 150px; margin: 0;">
+                <select id="adminItemCategory" class="modal-input" style="flex: 1; min-width: 130px; margin: 0;">
+                    <option value="Fishes">Fishes</option>
+                    <option value="Plants">Plants</option>
+                    <option value="Food">Food & Medicine</option>
+                    <option value="Accessories">Accessories</option>
+                </select>
+                <input type="number" id="adminItemPrice" placeholder="Price (₱)" step="0.01" required class="modal-input" style="width: 110px; margin: 0;">
+                <input type="number" id="adminItemStock" placeholder="Stock Qty" required class="modal-input" style="width: 100px; margin: 0;">
+                <input type="text" id="adminItemImg" placeholder="Image URL (Optional)" class="modal-input" style="flex: 1.5; min-width: 180px; margin: 0;">
+                <button type="submit" class="submit-btn" style="width: auto; background: #047857; padding: 8px 20px;">Add Item</button>
+            </form>
+        </div>
+    </section>
     <div class="hero-banner" id="hero">
         <h2 data-i18n="heroTitle">Premium Freshwater Life, Aquariums & Accessories</h2>
         <p data-i18n="heroSub">Your one-stop shop for healthy fishes and top-tier aquatic equipment</p>
     </div>
-
     <main class="container">
         <section class="category-section" id="fishesSection">
             <h2 class="section-title" data-i18n="secFishes">🐟 Freshwater Fishes</h2>
@@ -66,7 +92,7 @@
             <div id="plantsList" class="grid"></div>
         </section>
         <section class="category-section" id="foodSection">
-            <h2 class="section-title" data-i18n="secFood">🥫 Food & Medicine</h2>
+            <h2 class="section-title" data-i18n="secFood">FC Food & Medicine</h2>
             <div id="foodList" class="grid"></div>
         </section>
         <section class="category-section" id="accessoriesSection">
@@ -74,7 +100,16 @@
             <div id="accessoriesList" class="grid"></div>
         </section>
     </main>
-
+    <!-- CUSTOM POPUP MODAL -->
+    <div id="customPopupModal" class="popup-overlay" style="display: none;" onclick="closeCustomPopup()">
+        <div class="popup-card" onclick="event.stopPropagation()">
+            <div style="font-size: 2.8rem; color: #047857; margin-bottom: 8px;">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <p id="customPopupMessage" style="font-size: 1.1rem; font-weight: bold; color: #064e3b; margin-bottom: 20px; line-height: 1.4;">Message</p>
+            <button onclick="closeCustomPopup()" class="submit-btn" style="background: #047857; font-size: 1rem; padding: 8px 30px; width: auto;">OK</button>
+        </div>
+    </div>
     <!-- CUSTOMER SERVICE CHAT WIDGET -->
     <div id="chatWidget" class="chat-widget">
         <button class="chat-toggle-btn" onclick="toggleChatWindow()">
@@ -100,7 +135,6 @@
             </div>
         </div>
     </div>
-
     <!-- SEARCH MODAL -->
     <div id="searchModal" class="modal">
         <div class="modal-content">
@@ -110,8 +144,7 @@
             <div id="searchResults" class="search-results-grid"></div>
         </div>
     </div>
-
-    <!-- LOGIN / SIGN UP MODAL -->
+    <!-- CUSTOMER LOGIN / SIGN UP MODAL -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
@@ -120,9 +153,8 @@
             <div id="signUpSuccessMsg" style="display:none; background: #dcfce7; color: #15803d; padding: 10px; border-radius: 6px; font-size: 0.88rem; margin-bottom: 12px; text-align: center;">
                 ✅ Account created successfully! Please log in with your credentials.
             </div>
-
             <form id="customerLoginForm" onsubmit="handleAuthSubmit(event)" autocomplete="on">
-                <input type="email" id="loginEmail" name="email" placeholder="Email Address" required class="modal-input" autocomplete="email" data-i18n-placeholder="emailPlaceholder">
+                <input type="email" id="loginEmail" name="email" placeholder="Email Address" required class="modal-input" autocomplete="username" data-i18n-placeholder="emailPlaceholder">
                 <input type="password" id="loginPassword" name="password" placeholder="Password" required class="modal-input" autocomplete="current-password" data-i18n-placeholder="passPlaceholder">
                 <button type="submit" class="submit-btn" id="loginSubmitBtn" data-i18n="loginBtn">Log In</button>
             </form>
@@ -132,7 +164,19 @@
             </p>
         </div>
     </div>
-
+    <!-- SEPARATE ADMIN LOGIN MODAL -->
+    <div id="adminLoginModal" class="modal">
+        <div class="modal-content" style="border-top: 5px solid #047857;">
+            <span class="close-btn" onclick="closeModal('adminLoginModal')">&times;</span>
+            <h2 style="color: #064e3b; margin-bottom: 15px;">🔑 Admin Desk Access</h2>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">Enter official administrator credentials to manage products and stocks.</p>
+            <form onsubmit="handleAdminLoginSubmit(event)">
+                <input type="text" id="adminUser" placeholder="Admin Username" required class="modal-input">
+                <input type="password" id="adminPass" placeholder="Admin Password" required class="modal-input">
+                <button type="submit" class="submit-btn" style="background: #047857;">Log In as Admin</button>
+            </form>
+        </div>
+    </div>
     <!-- PROFILE MODAL -->
     <div id="accountModal" class="modal">
         <div class="modal-content modal-large">
@@ -144,7 +188,6 @@
                     <p style="margin: 3px 0 0 0; color: #64748b; font-size: 0.85rem;" data-i18n="verifiedText">Verified Member</p>
                 </div>
             </div>
-
             <div class="customer-info-box" style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px;">
                 <h4 style="margin: 0 0 10px 0; color: #064e3b; font-size: 0.95rem;" data-i18n="profileEditTitle">✏️ My Profile & Default Shipping Info:</h4>
                 <form id="profileEditForm" onsubmit="saveProfileDetails(event)">
@@ -166,7 +209,6 @@
                     </div>
                 </form>
             </div>
-
             <div class="order-tabs">
                 <span class="order-tab active" onclick="filterOrderTab('all', this)" data-i18n="tabAll">All Orders</span>
                 <span class="order-tab" onclick="filterOrderTab('Pending', this)" data-i18n="tabPending">Pending</span>
@@ -182,7 +224,6 @@
             </div>
         </div>
     </div>
-
     <!-- SHOPPING CART MODAL -->
     <div id="cartModal" class="modal">
         <div class="modal-content modal-large">
@@ -192,7 +233,6 @@
             <div id="cartItemsContainer">
                 <p style="font-size: 1.5rem; color: #475569; text-align: center; margin: 30px 0;" data-i18n="cartEmpty">Your cart is empty</p>
             </div>
-
             <div class="cart-summary-box" style="margin-top: 15px; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                     <span data-i18n="lblSubtotal">Subtotal:</span>
@@ -208,7 +248,6 @@
                     <strong>₱<span id="cartTotal">0.00</span></strong>
                 </div>
             </div>
-
             <div id="loginNoticeSection" class="login-notice-box" style="display: none;">
                 <button onclick="closeModal('cartModal')" class="continue-shopping-btn" data-i18n="btnContinue">Continue shopping</button>
                 <div style="margin-top: 20px;">
@@ -218,14 +257,12 @@
                     </p>
                 </div>
             </div>
-
             <!-- CHECKOUT FORM -->
             <div class="checkout-form" id="checkoutSection" style="display: none; margin-top: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #a7f3d0; padding-bottom: 5px; margin-bottom: 12px;">
                     <h3 style="color: #064e3b; margin: 0;" data-i18n="deliveryTitle">🚚 Delivery Address Details</h3>
                     <button type="button" onclick="fillFromProfile()" class="use-profile-btn" data-i18n="btnUseProfile">📍 Use Profile Address</button>
                 </div>
-
                 <form id="deliveryForm" onsubmit="handlePlaceOrder(event)">
                     <input type="text" id="custName" placeholder="Full Name" required class="modal-input" autocomplete="off" data-i18n-placeholder="namePlaceholder">
                     
@@ -236,7 +273,6 @@
                     <select id="custProvince" onchange="handleProvinceChange()" required class="modal-input">
                         <option value="" disabled selected data-i18n="optSelectProv">-- Select Province (A-Z) --</option>
                     </select>
-
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <div>
                             <label style="font-weight: bold; color: #064e3b; display: block; font-size: 0.85rem;" data-i18n="lblCity">City / Municipality:</label>
@@ -251,7 +287,6 @@
                             </select>
                         </div>
                     </div>
-
                     <input type="text" id="custAddress" placeholder="House No., Street Name, Phase / Subdivision / Landmark" required class="modal-input" data-i18n-placeholder="addressPlaceholder">
                     
                     <label style="margin-top: 10px; display: block; font-weight: bold; color: #064e3b;" data-i18n="lblPayment">Payment Method:</label>
@@ -259,7 +294,6 @@
                         <option value="Cash on Delivery" data-i18n="optCod">Cash on Delivery (COD)</option>
                         <option value="Online Payment" data-i18n="optOnline">Online Payment (GCash / PayMaya)</option>
                     </select>
-
                     <div id="qrCodeContainer" style="display: none; text-align: center; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; margin: 15px 0;">
                         <p style="font-weight: bold; color: #064e3b; margin-bottom: 8px;" data-i18n="qrInstruction">Scan QR Code to Pay via GCash / PayMaya:</p>
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=AquaticHavenOfficialGCashPayment" alt="Payment QR Code" style="border-radius: 6px; border: 1px solid #cbd5e1;">
@@ -270,7 +304,6 @@
             </div>
         </div>
     </div>
-
     <!-- SUCCESS POPUP MODAL -->
     <div id="successModal" class="modal" style="display: none;">
         <div class="modal-content" style="text-align: center; max-width: 400px; animation: popIn 0.3s ease-out;">
@@ -282,7 +315,6 @@
             <button onclick="closeSuccessModal()" class="submit-btn" style="background: #047857; font-size: 1rem; padding: 10px 20px;" data-i18n="btnOk">OK</button>
         </div>
     </div>
-
     <footer id="contactSection">
         <div style="margin-bottom: 15px;">
             <h3 style="color: #fef08a; margin-bottom: 5px;" data-i18n="contactHeader">Contact Us</h3>
@@ -291,30 +323,25 @@
         </div>
         <p>&copy; 2026 Aquatic Haven - All rights reserved.</p>
     </footer>
-
     <script>
-        // Check User Log-in State
         let currentUser = JSON.parse(localStorage.getItem('aquatic_user')) || null;
         
-        // Cart Logic: Clear cart on page refresh if NOT LOGGED IN
         let cart = [];
-        if (currentUser) {
+        if (currentUser && currentUser.role !== 'admin') {
             cart = JSON.parse(localStorage.getItem('aquatic_cart')) || [];
         } else {
             localStorage.removeItem('aquatic_cart');
             cart = [];
         }
-
         let allProducts = [];
         let currentShippingFee = 0;
         let userOrders = [];
         let currentLang = localStorage.getItem('aquatic_lang') || 'EN';
-
         const i18n = {
             EN: {
                 navHome: "Home", navPlants: "Plants", navFishes: "Fishes", navFood: "Food & Medicine", navAccessories: "Accessories", navContact: "Contact",
                 heroTitle: "Premium Freshwater Life, Aquariums & Accessories", heroSub: "Your one-stop shop for healthy fishes and top-tier aquatic equipment",
-                secFishes: "🐟 Freshwater Fishes", secPlants: "🌱 Aquatic Plants", secFood: "🥫 Food & Medicine", secAccessories: "⚙️ Aquariums & Accessories",
+                secFishes: "🐟 Freshwater Fishes", secPlants: "🌱 Aquatic Plants", secFood: "FC Food & Medicine", secAccessories: "⚙️ Aquariums & Accessories",
                 searchTitle: "🔍 Search Products", loginHeader: "👤 Customer Log in", loginBtn: "Log In", noAccount: "Don't have an account?", signUpText: "Sign Up",
                 verifiedText: "Verified Member", profileEditTitle: "✏️ My Profile & Default Shipping Info:", lblProfName: "Full Name:", lblProfContact: "Contact Number:", lblProfAddress: "Complete Delivery Address:", btnSaveProfile: "Save Profile Details",
                 tabAll: "All Orders", tabPending: "Pending", tabShip: "To Ship", tabCompleted: "Completed", tabRefund: "Refund",
@@ -333,7 +360,7 @@
             TAG: {
                 navHome: "Tahanan", navPlants: "Halaman", navFishes: "Isda", navFood: "Pagkain at Gamot", navAccessories: "Kagamitan", navContact: "Pormularyo",
                 heroTitle: "Mataas na Kalidad ng Isda, Akwaryum at Kagamitan", heroSub: "Ang iyong paboritong online pet shop para sa malusog na mga isda",
-                secFishes: "🐟 Mga Isdang Matabang-Tubig", secPlants: "🌱 Mga Halamang-Tubig", secFood: "🥫 Pagkain at Gamot", secAccessories: "⚙️ Akwaryum at Kagamitan",
+                secFishes: "🐟 Mga Isdang Matabang-Tubig", secPlants: "🌱 Mga Halamang-Tubig", secFood: "FC Pagkain at Gamot", secAccessories: "⚙️ Akwaryum at Kagamitan",
                 searchTitle: "🔍 Maghanap ng Produkto", loginHeader: "👤 Mag-Log in bilang Customer", loginBtn: "Pumasok (Log In)", noAccount: "Wala pang account?", signUpText: "Mag-sign Up",
                 verifiedText: "Kumpirmadong Miyembro", profileEditTitle: "✏️ Impormasyon ng Profile at Tirahan:", lblProfName: "Buong Pangalan:", lblProfContact: "Contact Number:", lblProfAddress: "Kumpletong Tirahan (Address):", btnSaveProfile: "I-save ang Profile",
                 tabAll: "Lahat ng Order", tabPending: "Naka-pending", tabShip: "Ipapadala", tabCompleted: "Kumpleto Na", tabRefund: "Ipa-Refund",
@@ -350,7 +377,13 @@
                 namePlaceholder: "Buong Pangalan", contactPlaceholder: "Contact Number (hal. 09123456789)", addressPlaceholder: "House No., Street Name, Phase / Subdivision / Landmark"
             }
         };
-
+        function showCustomPopup(message) {
+            document.getElementById('customPopupMessage').innerText = message;
+            document.getElementById('customPopupModal').style.display = 'flex';
+        }
+        function closeCustomPopup() {
+            document.getElementById('customPopupModal').style.display = 'none';
+        }
         function applyLanguage() {
             document.getElementById('langText').innerText = currentLang === 'EN' ? 'Tagalog' : 'English';
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -367,39 +400,363 @@
             });
             renderCart();
         }
-
         function toggleLanguage() {
             currentLang = currentLang === 'EN' ? 'TAG' : 'EN';
             localStorage.setItem('aquatic_lang', currentLang);
             applyLanguage();
         }
-
+        // KUMPLETONG DATABASE NG MGA PROBINSYA, MUNISIPYO AT BARANGAY SA PILIPINAS (UPDATED)
         const provincesDB = {
-            "ABRA": { region: "Luzon", cities: { "Bangued": ["Angad", "Calaba", "Poblacion"] } },
-            "AGUSAN DEL NORTE": { region: "Mindanao", cities: { "Butuan City": ["Bayanihan", "Poblacion"] } },
-            "AKLAN": { region: "Visayas", cities: { "Kalibo": ["Andagao", "Poblacion"], "Malay (Boracay)": ["Balabag", "Manoc-Manoc"] } },
-            "ALBAY": { region: "Luzon", cities: { "Legazpi City": ["Poblacion", "Rawis"] } },
-            "BATAAN": { region: "Luzon", cities: { "Balanga City": ["Poblacion", "Tenejero"] } },
-            "BATANGAS": { region: "Luzon", cities: { "Batangas City": ["Kumintang Ilaya", "Poblacion"], "Lipa City": ["Poblacion"] } },
-            "BENGUET": { region: "Luzon", cities: { "Baguio City": ["Burnham Park", "Session Road Area"] } },
-            "BOHOL": { region: "Visayas", cities: { "Tagbilaran City": ["Cogon", "Poblacion"] } },
-            "BULACAN": { region: "Luzon", cities: { "Malolos City": ["Catmon", "Guinhawa"], "Meycauayan City": ["Banga", "Lawa"] } },
-            "CAVITE": { region: "Luzon", cities: { "Bacoor City": ["Molino I"], "Dasmarinas City": ["Paliparan"] } },
-            "CEBU": { region: "Visayas", cities: { "Cebu City": ["Ayala Center", "IT Park", "Lahug"] } },
-            "DAVAO DEL SUR": { region: "Mindanao", cities: { "Davao City": ["Buhangin", "Lanang", "Matina"] } },
-            "ILOILO": { region: "Visayas", cities: { "Iloilo City": ["Jaro", "Mandurriao"] } },
-            "LAGUNA": { region: "Luzon", cities: { "Calamba City": ["Canlubang", "Real"], "Santa Rosa City": ["Balibago"] } },
-            "METRO MANILA (NCR)": { region: "Luzon", cities: { "Makati City": ["Bel-Air", "Poblacion"], "Manila City": ["Binondo", "Ermita"], "Quezon City": ["Cubao", "Diliman"] } },
-            "PAMPANGA": {
+            "Abra": { 
+                region: "Luzon", 
+                cities: { 
+                    "Bangued (Capital)": ["Agtangao", "Angad", "Banacao", "Bangbangar", "Cabuloan", "Calaba", "Cosili West", "Cosili East", "Dangdangla", "Lingtan", "Lipcan", "Luakang", "Maasin", "Macacaddac", "Macray", "Malamsit", "Palao", "Poblacion", "Sagap", "San Antonio", "Santa Rosa", "Sao-atan", "Sappaac", "Tablac", "Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5", "Zone 6", "Zone 7"], 
+                    "Boliney": ["Amti", "Boliney", "Danac East", "Danac West", "Dao-angan", "Kilong-Olao", "Poblacion"], 
+                    "Bucay": ["Abang", "Bangcagan", "BangLolo", "Bugbog", "Caliit", "Calaba", "Labon", "LAYUGA", "Lingey", "Lucda", "Mabanag", "Mucdoc", "North Poblacion", "South Poblacion", "Pagala", "Palaquio", "Pakiling", "Salnec", "San Jose", "Siblong", "Tabiog"],
+                    "Bucloc": ["Ducligan", "Labaan", "Lingay", "Lamao"],
+                    "Daguioman": ["Ableg", "Cabaruyan", "Pikek", "Tineg"],
+                    "Danglas": ["Abquic", "Cabaruan", "Caupasan", "Danglas", "Nagaparan", "Padanglo", "Poblacion"],
+                    "Dolores": ["Cabaroan", "Calumbaya", "Cardona", "Isit", "Kimmalaba", "Libtec", "Mudiit", "Namarabar", "Poblacion", "Salnec", "San Juan", "Santa Cruz", "TAYUM boundary"],
+                    "La Paz": ["Benben", "Canan", "San Carlos", "San Gregorio", "San Jose", "San Juan", "Toon", "Poblacion"],
+                    "Lacub": ["Bacag", "Buneg", "Guinguinabang", "Lan-ag", "Poblacion (Talampac)"],
+                    "Lagangilang": ["Aguet", "Bawa", "Laang", "Lagben", "Laguiben", "Naguilian", "Poblacion", "San Antonio"],
+                    "Lagayan": ["Collago", "Pang-ot", "Poblacion", "Nagtipulan"],
+                    "Langiden": ["Baac", "Dalaguisen", "Poblacion", "Quidaoen", "San Isidro"],
+                    "Licuan-Baay": ["Bonglo", "Bulbulala", "Cawayan", "Subagan", "Tumalip", "Poblacion"],
+                    "Luba": ["Ampalioc", "Barit", "Gayaman", "Lul-Luno", "Poblacion", "Sabnangan"],
+                    "Manabo": ["Catacdegan Nuevo", "Catacdegan Viejo", "Luzong", "San Ramon", "San Jose", "Ayyeng"],
+                    "Peñarrubia": ["Dumayco", "Lusuac", "Namarabar", "Patucannay", "Poblacion", "Riang", "Santa Rosa"],
+                    "Pidigan": ["Alsan West", "Arab", "Arrayoc", "Monggoc", "Naguirayan", "Pamutic", "Poblacion", "Sulbec"],
+                    "Pilar": ["Bolbolo", "ONOQUI", "Pang-ot", "Poblacion", "San Fermin", "Santa Lobella", "Villaviciosa"],
+                    "Sallapadan": ["Bilalasin", "Gangal", "Maguyepyep", "Naglibacan", "Poblacion", "Saceca", "Subusob"],
+                    "San Isidro": ["Cabayogan", "Dalungeg", "Naguilian", "Poblacion", "Sablang"],
+                    "San Juan": ["Abang", "Ba-i", "BILA", "BLA", "Cabagao", "Culliong", "LLO", "Poblacion", "Quidaoen"],
+                    "San Quintin": ["Amtuagan", "Labaan", "Palang", "Poblacion", "Tangadan"],
+                    "Tayum": ["Bagalay", "Basbasa", "Budac", "Bumagcat", "Cabaroan", "Gaddani", "Patucannay", "Poblacion", "Velasco"],
+                    "Tineg": ["Agsimao", "Alao", "Anayan", "Caganayan", "Capiyan", "Lanec", "Naglibacan", "Poblacion"],
+                    "Tubo": ["Alangtin", "Amtandao", "Dilong", "Kili", "Mayabo", "Poblacion (Mayabo)", "Supo", "Wayangan"],
+                    "Villaviciosa": ["Amti", "Calao", "Lap-lapog", "Lumaba", "Poblacion", "Tampac", "Tuquib"]
+                } 
+            },
+            "Apayao": { 
+                region: "Luzon", 
+                cities: { 
+                    "Calanasan (Capital)": ["Eleazar", "Eva", "Local", "Naguilian", "Poblacion", "Sabangan", "Sta. Filomena"], 
+                    "Conner": ["Allangigan", "Caglayan", "Cupis", "Guinaang", "Karikitan", "Malama", "Manag", "Nabuangan", "PADDAO", "Poblacion"], 
+                    "Flora": ["Alliam", "Anninipan", "Balasi", "Balluyan", "Malayugan", "Poblacion East", "Poblacion West", "San Jose", "Tamalunog"],
+                    "Kabugao": ["Badducat", "Baliwanan", "Cagandungan", "Dibagat", "Karagawan", "Laco", "Musimut", "Poblacion"],
+                    "Luna": ["Calagaoan", "Capagayasan", "Dagupan", "Lappa", "Luac", "Marag", "Poblacion", "San Isidro", "Zumigue"],
+                    "Pudtol": ["Ammacian", "Capannikian", "Lower Maton", "Malibang", "Poblacion", "San Jose", "Swan", "Upper Maton"],
+                    "Santa Marcela": ["Baroc", "Consuelo", "Imelda", "Malabanag", "Marcela", "Poblacion", "San Carlos", "San Juan"]
+                } 
+            },
+            "Benguet": { 
+                region: "Luzon", 
+                cities: { 
+                    "Baguio City (Highly Urbanized)": ["Atok Trail", "Bakakeng Central", "Bakakeng North", "Camp 7", "Camp 8", "City Camp Central", "Engineers' Hill", "Irisan", "Loakan Proper", "Lower Lourdes", "Guisad Central", "Magsaysay", "Pacdal", "Pinsao Proper", "Quezon Hill", "Quirino Hill", "Relief", "Session Road", "South Drive", "Sto. Tomas"], 
+                    "Atok": ["Abiang", "Caliking", "Cattubo", "Nableng", "Paoay", "Pasdong", "Poblacion", "Topdac"],
+                    "Bakun": ["Ampusongan", "Bagu", "Dalipey", "Gambang", "Kayapa", "Poblacion", "Sinipsip"],
+                    "Bokod": ["Ambuclao", "Bila", "Bobok-Bisal", "Daclan", "Ekip", "Karao", "Nawal", "Poblacion", "Pito", "Tuto"],
+                    "Buguias": ["Amlimay", "Baculongan North", "Baculongan South", "Calamiting", "Catlubong", "Loo", "Natubleng", "Poblacion", "Sebang"],
+                    "Itogon": ["Ampucao", "Dalupirip", "GUMOC", "Loacan", "Poblacion", "Tinongdan", "Tual", "Ucab"],
+                    "Kabayan": ["Anshokey", "Ballay", "Bashoy", "Duacan", "Eddet", "Kamico", "Lusod", "Pacso", "Poblacion", "Tawangan"],
+                    "Kapangan": ["Central", "Datacan", "Beleng-Beleng", "Cuba", "Gadang", "Gaswiling", "Labueg", "Paykek", "Pongayan"],
+                    "Kibungan": ["LADA", "Madaymen", "Palina", "Poblacion", "Tacadang", "Sagpat"],
+                    "La Trinidad (Capital)": ["Alapang", "Alno", "Ambiong", "Bahong", "Balili", "Beckel", "Cruz", "Pico", "Poblacion", "Puguis", "Shilan", "Tawang", "Wangal"], 
+                    "Mankayan": ["Balili", "Bedbed", "Bulalacao", "Cabiten", "Colalo", "Guinaoang", "Poblacion", "Tabio", "Taneg"],
+                    "Sablan": ["Bagong", "Balluay", "Banangan", "Banengbeng", "Kamog", "Poblacion", "Pappa"],
+                    "Tuba": ["Camp 1", "Camp 3", "Camp 4", "Poblacion", "San Pascual", "Tabaan Sur", "Tabaan Norte", "Twin Peaks"],
+                    "Tublay": ["Ambamag", "Caponga", "Daclan", "Tublay Central", "Tuel"]
+                } 
+            },
+            "Ilocos Norte": { 
+                region: "Luzon", 
+                cities: { 
+                    "Laoag City (Capital)": ["Brgy. 1 (San Lorenzo)", "Brgy. 2 (Santa Joaquina)", "Brgy. 9 (Balintawak)", "Brgy. 12 (San Nicolas)", "Brgy. 23 (San Miguel)", "Brgy. 36 (Araniw)", "Brgy. 40 (Balatong)", "Brgy. 50 (Button)"], 
+                    "Batac City": ["Acosta", "Aglipay", "Baay", "Baoa East", "Baoa West", "Bil-loca", "Cangrunaan", "Nagbacalan", "Poblacion", "Quiling Norte", "San Julian", "San Mateo"], 
+                    "Bacarra": ["Buyon", "Cabaruan", "Cadaratan", "Corocor", "Libtong", "Nambaran", "Poblacion", "Santa Rita"],
+                    "Badoc": ["Alogoog", "Ar-arusip", "Apatut", "Carot", "Labut", "Nagirangan", "Poblacion", "Saunders"],
+                    "Bangui": ["Abaca", "Bacsil", "Baruyen", "Dadaor", "Lanao", "Malasin", "Manayon", "Poblacion"],
+                    "Banna": ["Balioeg", "Bangsar", "Bomitog", "Marcos", "Poblacion", "Valdez"],
+                    "Burgos": ["Agsannor", "Bobon", "Buduan", "Nagsurot", "Paayas", "Poblacion", "Tanap"],
+                    "Carasi": ["Angalo", "Barbaqueso", "Virbira"],
+                    "Currimao": ["Angra", "Cabuusan", "Comcomloong", "Gaang", "Lioes", "Poblacion", "Salugan"],
+                    "Dingras": ["Albano", "Baresbes", "Bungcag", "Cali", "Madamba", "San Francisco", "San Marcos"],
+                    "Dumalneg": ["Cabaritan", "Kalaw", "Poblacion"],
+                    "Marcos": ["Cabsiran", "Daquioag", "Fortuna", "Lydia", "Mabuti", "Pacifico", "Poblacion"],
+                    "Nueva Era": ["Cabittauran", "Caray", "Garnaden", "Naguillan", "Poblacion", "Santo Niño"],
+                    "Pagudpud": ["Aggasi", "Baduar", "Balaoi", "Burayoc", "Caparispisan", "Poblacion", "Saud", "Tarrag"],
+                    "Paoay": ["Bacasil", "Cabalandongan", "Laug", "Mumulaan", "Nagbacalan", "Poblacion", "Suba"],
+                    "Pasuquin": ["BLA", "Caruan", "Naglicuan", "Nalvo", "Poblacion", "Santa Cruz", "Sulbec"],
+                    "Piddig": ["Ab-Abtan", "Calungboyan", "Dipilat", "Gayamat", "Mangato", "Poblacion", "Suagany"],
+                    "Pinili": ["Azares", "Badio", "Barbar", "Cabaroan", "Poblacion", "Valbuena"],
+                    "San Nicolas": ["Catuguing", "San Baltazar", "San Francisco", "San Hilario", "San Jose", "San Pedro"],
+                    "Sarrat": ["San Antonio", "San Felipe", "San Lázaro", "San Lorenzo", "San Nicolas", "San Vicente"],
+                    "Solsona": ["Agwit", "Bagbag", "Baresbes", "Capurictan", "Laurel", "Poblacion", "Puttao"],
+                    "Vintar": ["Alsem", "Baren", "Cabaroan", "Columbia", "Lubnac", "Salsalamagui", "Tamdagan"]
+                } 
+            },
+            "Bulacan": { 
+                region: "Luzon", 
+                cities: { 
+                    "Malolos City (Capital)": ["Atlag", "Bagna", "Balite", "Barihan", "Bulihan", "Calero", "Canalate", "Caingang", "Catmon", "Cofradia", "Dakila", "Guinhawa", "Liang", "Ligas", "Look 1st", "Lugam", "Mabolo", "Mambog", "Mojon", "Panasahan", "Paseo de del Pilar", "Sumapang Matanda", "Tikay"], 
+                    "Meycauayan City": ["Bagbaguin", "Bahay Pare", "Bancal", "Calvario", "Camalig", "Hulo", "Lawa", "Malhacan", "Perez", "Poblacion", "Saluysoy", "Tugatog", "Zamora"], 
+                    "San Jose del Monte City": ["Assumption", "Bagong Towng", "Citrus", "Fatima", "Graceville", "Gaya-Gaya", "Minuyan", "Muzon", "Paradise Farms", "Poblacion", "Tungkong Mangga"],
+                    "Baliwag City": ["Bagong Nayon", "Concepcion", "Hinukay", "Makinabang", "Matangtubig", "Pagala", "Poblacion", "Sabang", "San Jose", "Subic", "Tangos", "Tibag"],
+                    "Bocaue": ["Antipona", "Bagumbayan", "Bambang", "Bolacan", "Bundukan", "Igulot", "Lolomboy", "Poblacion", "Turo", "Wakas"],
+                    "Calumpit": ["Balungao", "Buguion", "Calizon", "Frances", "Gatbuca", "Iba O'Este", "Longos", "Meysulao", "Poblacion", "Sucol"],
+                    "Guiguinto": ["Cutcut", "Daungan", "Ilang-Ilang", "Malis", "Panginay", "Poblacion", "Pritil", "Tabang", "Tabe", "Tiaong"],
+                    "Hagonoy": ["Abulalas", "Carillo", "San Agustin", "San Jose", "San Nicolas", "San Pascual", "San Pedro", "San Roque", "Santa Cruz", "Santo Rosario"],
+                    "Marilao": ["Abangan Norte", "Abangan Sur", "Ibayo", "Lias", "Loma de Gato", "Nagbalon", "Poblacion", "Prenza", "Tabing Ilog"],
+                    "Plaridel": ["Agnaya", "Bintog", "Bulihan", "Culianin", "Dampol", "Lumang Bayan", "Poblacion", "Sipat", "Tabang"],
+                    "Pulilan": ["Balatong A", "Cutcot", "Dampol", "Inaon", "Longos", "Lumbac", "Paltao", "Poblacion", "Sto. Cristo", "Tibag"],
+                    "Santa Maria": ["Bagbaguin", "Catmon", "Caypombo", "Guyong", "Lalakhan", "Mag-asawang Sapat", "Mahabang Parang", "Poblacion", "Pulong Buhangin", "San Jose Patag", "Silangan"]
+                } 
+            },
+            "Pampanga": { 
+                region: "Luzon", 
+                cities: { 
+                    "Angeles City (Highly Urbanized)": ["Anunas", "Balibago", "Cutcut", "Malabanias", "Margot", "Mining", "Pampang", "Pulung Maragul", "Pulung Cacutud", "Salapungan", "Sto. Cristo", "Sto. Domingo", "Sapangbato", "Tabun"], 
+                    "San Fernando City (Capital)": ["Dolores", "Greenfields", "Lara", "Lourdes", "Magliman", "Maimpis", "Malpitic", "Pandaras", "Panipuan", "San Agustin", "San Jose", "San Nicolas", "Sindalan", "Sta. Lucia", "Telabastagan"], 
+                    "Arayat": ["Arenas", "Baliti", "Camba", "Candaba", "Cupang", "Kaledian", "Matamo", "Poblacion", "San Agustin", "San Nicolas", "Sto. Niño", "Tabuan"],
+                    "Bacolor": ["Cabalantian", "Cabsambag", "Dolores", "Magliman", "Parulog", "San Antonio", "San Isidro", "Sta. Ines", "Sta. Barbara"],
+                    "Candaba": ["Bahay Pare", "Bambang", "Barangca", "Mandasig", "Mandili", "Mangga", "Pasig", "Pescadores", "Poblacion", "San Agustin", "Tagulod"],
+                    "Floridablanca": ["Anon", "Apalit", "Basa Air Base", "Bodega", "Cabangcalan", "Calantas", "Carmencita", "Fortuna", "Mabical", "Poblacion", "San Jose", "Valdez"],
+                    "Guagua": ["Bancal", "Ascomo", "Lambac", "Plaza Burgos", "Pulungmasle", "Rizal", "San Agustin", "San Juan", "San Pedro", "Sta. Filomena", "Sta. Ines", "Sto. Cristo"], 
+                    "Lubao": ["Baruya", "Calangain", "Concepcion", "Prado Siongco", "San Agustin", "San Francisco", "San Jose Gumi", "San Nicolas 1st", "Sta. Cruz", "Sta. Lucia"],
+                    "Mabalacat City": ["Atlu-Bola", "Bical", "Bundagul", "Dau", "Dolores", "Mabiga", "Marcos Village", "Mawaque", "Poblacion", "San Francisco", "Tabun"],
+                    "Macabebe": ["Caduang Tete", "Castuli", "Consuelo", "San Esteban", "San Francisco", "San Gabriel", "San Jose", "San Rafael", "Sta. Maria", "Sto. Niño"],
+                    "Mexico": ["Arayat", "Lagundi", "Masagsag", "Panipuan", "Poblacion", "San Antonio", "San Carlos", "San Jose Matulid", "San Nicolas", "Sto. Rosario"],
+                    "Porac": ["Babo Sacan", "Cabuyao", "Cangatba", "Poblacion", "Manibaug Libutad"],
+                    "San Luis": ["San Agustin", "San Isidro", "San Jose", "San Nicolas", "Santa Cruz"],
+                    "San Simon": ["San Agustin", "San Isidro", "San Jose", "San Nicolas", "Santa Monica"],
+                    "Sasmuan": ["Mabuanbuan", "Malusac", "Poblacion", "Santa Lucia", "Santo Tomas"],
+                    "Santa Rita": ["Becuran", "Dila Dila", "Poblacion", "San Agustin", "San Jose"],
+                    "Santo Tomas": ["Moras De La Paz", "Poblacion", "San Bartolome", "San Matias"]
+                } 
+            },
+            "Cavite": {
                 region: "Luzon",
                 cities: {
-                    "Angeles City": ["Anunas", "Balibago", "Cutcut", "Malabanias", "Pulung Maragul", "Sto. Rosario"],
-                    "City of San Fernando": ["Calulut", "Dolores", "Maimpis", "San Agustin", "Telebastagan"],
-                    "Mabalacat City": ["Camachiles", "Dau", "Duquit", "Mabalacat Poblacion"]
+                    "Cavite City": ["Caridad", "Dalahican", "Kaingen", "San Antonio", "San Roque", "Sta. Cruz", "Zones 1–10"],
+                    "Bacoor City": ["Aniban", "Habay", "Mambog", "Molino I–VII", "Niog", "Panapaan", "Queens Row", "Salinas", "Talaba", "Zapote"],
+                    "Dasmariñas City": ["Burol", "Langkaan", "Paliparan I–III", "Salawag", "Sampaloc", "San Agustin", "Salitran", "Zone I–IV"],
+                    "Imus City": ["Alapan", "Anabu", "Bucandala", "Malagasang", "Poblacion", "Bayan Luma", "Carsadang Bago", "Tanzang Lumat"],
+                    "General Trias City": ["Arnaldo", "Bacao", "Buenavista", "Manggahan", "Navarro", "Pasong Camachile", "San Francisco", "Tejero"],
+                    "Tagaytay City": ["Asisan", "Bagong Tubig", "Guinhawa", "Kaybagal", "Maharlika", "Mendez Crossing", "Sungay", "Silang Junction", "Zapote"],
+                    "Trece Martires City (Capital)": ["Aguinaldo", "Cabezas", "Concepcion", "Inocencio", "Lallana", "Luciano", "Osorio", "Perez", "San Agustin"],
+                    "Alfonso": ["Poblacion", "Mangas", "Amuyong"],
+                    "Amadeo": ["Poblacion", "Dagatan", "Banaybanay"],
+                    "Carmona City": ["Madrigal", "Poblacion", "Cabilang Baybay"],
+                    "GEA (Bailen)": ["Poblacion", "Castaños Cerca"],
+                    "Indang": ["Poblacion", "Buna Cerca", "Tambo Malaki"],
+                    "Kawit": ["Binakayan", "Poblacion", "Gahak"],
+                    "Maragondon": ["Poblacion", "Garita", "Bucal"],
+                    "Mendez": ["Poblacion", "Anuling"],
+                    "Naic": ["Poblacion", "Ibayo", "Timalan"],
+                    "Noveleta": ["Poblacion", "San Rafael", "Magdiwang"],
+                    "Rosario": ["Ligtong", "Poblacion", "Tejeros Convention"],
+                    "Silang": ["Poblacion", "Bulihan", "Balaquilong"],
+                    "Tanza": ["Poblacion", "Bucal", "Biga"],
+                    "Ternate": ["Poblacion", "San José", "Sapang"]
                 }
-            }
+            },
+            "Laguna": {
+                region: "Luzon",
+                cities: {
+                    "Biñan City": ["Canlalay", "De La Paz", "Ganado", "Langkiwa", "Mamplasan", "Platero", "Poblacion", "San Francisco", "Sto. Tomas", "Zapote"],
+                    "Cabuyao City": ["Banaybanay", "Banlic", "Bigaa", "Gulod", "Mamatid", "Niugan", "Pulo", "Sala", "San Isidro", "Tres"],
+                    "Calamba City (Regional Center)": ["Barandal", "Batino", "Bubuyan", "Canlubang", "Halang", "Kay-Anlog", "Lawa", "Majada Labas", "Paciano Rizal", "Palingon", "Real", "Saimsim", "Turbina"],
+                    "San Pablo City": ["Bagong Pook", "Del Remedios", "San Crispim", "San Francisco", "San Gabriel", "San Jose", "San Lucas", "San Mateo", "San Rafael", "Sta. Maria", "Schetelig"],
+                    "San Pedro City": ["San Antonio", "San Vicente", "Pacita I & II", "Landayan", "Chrysanthemum", "Cuyab", "Sampaguita Village"],
+                    "Santa Rosa City": ["Balibago", "Don Jose", "Dita", "Labas", "Malitlit", "Ibaba", "Tagapo", "Sinalhan", "Sto. Domingo"],
+                    "Santa Cruz (Capital)": ["Bagumbayan", "Calios", "Duhat", "Gatid", "Labuin", "Pagsawitan", "Poblacion I–IV", "Santisima Cruz"]
+                }
+            },
+            "Cebu": {
+                region: "Visayas",
+                cities: {
+                    "Cebu City (Capital / Highly Urbanized)": ["Adlaon", "Banilad", "Basak San Nicolas", "Busay", "Calamba", "Camputhaw", "Capitol Site", "Guadalupe", "Lahug", "Mabolo", "Pardo", "Pit-os", "Punta Princesa", "Sambag", "San Nicolas", "Talamban", "Tisa", "Zapatera"],
+                    "Lapu-Lapu City (Highly Urbanized)": ["Basak", "Buaya", "Bankal", "Gun-ob", "Looc", "Mactan", "Maribago", "Marigondon", "Olango Island", "Pajo", "Pusok", "Subabasbas"],
+                    "Mandaue City (Highly Urbanized)": ["Alang-alang", "Bakilid", "Banilad", "Cabancalan", "Canduman", "Centro", "Casuntingan", "Jagobiao", "Looc", "Maguikay", "Tipolo", "Subangdaku"],
+                    "Bogo City": ["Anapog", "Giloctog", "Poblacion", "San Vicente"],
+                    "Carcar City": ["Can-asujan", "Poblacion", "Tuyom"],
+                    "Danao City": ["Dungga", "Poblacion", "Sabang"],
+                    "Naga City": ["Inoburan", "Poblacion", "Tinaan"],
+                    "Talisay City": ["Cansojong", "Poblacion", "Tabunok"],
+                    "Toledo City": ["Bato", "Poblacion", "Sangi"],
+                    "Alcantara": ["Poblacion", "Palanas"],
+                    "Alcoy": ["Poblacion", "Pugalo"],
+                    "Alegria": ["Poblacion", "Valencia"],
+                    "Aloguinsan": ["Poblacion", "Bonbon"],
+                    "Argao": ["Can-asujan", "Poblacion", "Talaga"],
+                    "Asturias": ["Poblacion", "Tubigagmanok"],
+                    "Badian": ["Lambug", "Poblacion", "Matutinao"],
+                    "Balamban": ["Aliwanay", "Poblacion", "Buanoy"],
+                    "Bantayan": ["Poblacion", "Suba", "Sulangan"],
+                    "Barili": ["Guibuangan", "Poblacion"],
+                    "Boljoon": ["El Pardo", "Poblacion"],
+                    "Borbon": ["Cadutu-an", "Poblacion"],
+                    "Carmen": ["Dawis Norte", "Poblacion"],
+                    "Catmon": ["Catmondaan", "Poblacion"],
+                    "Compostela": ["Canasujan", "Poblacion"],
+                    "Consolacion": ["Casili", "Poblacion", "Tayud"],
+                    "Cordoba": ["Catarman", "Poblacion", "Poblacion West"],
+                    "Daanbantayan": ["Agujo", "Poblacion", "Maya"],
+                    "Dalaguete": ["Casay", "Poblacion", "Mantalongon"],
+                    "Dumanjug": ["Ibo", "Poblacion", "Tangil"],
+                    "Ginatilan": ["Anao", "Poblacion"],
+                    "Liloan": ["Catarman", "Poblacion", "Yati"],
+                    "Madridejos": ["Buncag", "Poblacion", "Tugas"],
+                    "Malabuyoc": ["Armeña", "Poblacion"],
+                    "Medellin": ["Caputatan", "Poblacion"],
+                    "Minglanilla": ["Calajo-an", "Poblacion", "Tungkil"],
+                    "Moalboal": ["Basdiot", "Poblacion", "Saavedra"],
+                    "Oslob": ["Bangcogon", "Poblacion", "Tan-awan"],
+                    "Pilar": ["Esperanza", "Poblacion"],
+                    "Pinamungajan": ["Anislag", "Poblacion"],
+                    "Poro": ["Poblacion", "Eastern Poblacion"],
+                    "Ronda": ["Poblacion", "Palanas"],
+                    "Samboan": ["Poblacion", "Suba"],
+                    "San Fernando": ["Poblacion", "Sangat"],
+                    "San Francisco": ["Poblacion", "Consuelo"],
+                    "San Remigio": ["Poblacion", "Punta"],
+                    "Santa Fe": ["Okoy", "Poblacion", "Pooc"],
+                    "Santander": ["Liloan", "Poblacion"],
+                    "Sibonga": ["Bahay", "Poblacion"],
+                    "Sogod": ["Bawo", "Poblacion"],
+                    "Tabogon": ["Ilihan", "Poblacion"],
+                    "Tabuelan": ["Poblacion", "Tabunok"],
+                    "Tuburan": ["Poblacion", "Santo Niño"],
+                    "Tudela": ["Poblacion", "Villahermosa"]
+                }
+            },
+            "Davao del Sur": {
+                region: "Mindanao",
+                cities: {
+                    "Davao City (Highly Urbanized)": ["Agdao", "Buhangin", "Bunawan", "Calinan", "Baguio", "Marilog", "Poblacion", "Talomo", "Toril", "Tugbok", "Barangay 1-A to 40-D", "Mintal", "Tibungco", "Panacan", "Matina Crossing", "Ma-a"],
+                    "Digos City (Capital)": ["Aplaya", "BalABag", "Binaton", "Cogon", "Dulalia", "Kapatagan", "Matti", "Poblacion", "San Jose", "Tres De Mayo", "Zone 1–3"],
+                    "Bansalan": ["Poblacion", "Aplaya", "Mabuhay"],
+                    "Hagonoy": ["Poblacion", "Guihing", "Sacol"],
+                    "Kiblawan": ["Poblacion", "Pagalungan"],
+                    "Magsaysay": ["Poblacion", "Barayong"],
+                    "Malalag": ["Poblacion", "Baybay"],
+                    "Matanao": ["Poblacion", "Manga"],
+                    "Padada": ["Poblacion", "Palagao"],
+                    "Santa Cruz": ["Poblacion", "Coronon", "Inawayan"],
+                    "Sulop": ["Poblacion", "Lapla"]
+                }
+            },
+            "Maguindanao del Norte": {
+                region: "BARMM",
+                cities: {
+                    "Cotabato City (Regional Administrative Hub)": ["Bagua I–III", "Kalangan", "Poblacion I–IX", "Rosary Heights I–XIII", "Tamontaka I–V"],
+                    "Datu Odin Sinsuat (Capital)": ["Awang", "Bitu", "Dinaig", "Dulangan", "Kalandagan", "Labungan", "Linek", "Margues", "Oda", "Poblacion", "Tanuel", "Tapian"],
+                    "Barira": ["Poblacion", "Lahi-lahi"],
+                    "Blaan": ["Poblacion"],
+                    "Datu Blah T. Sinsuat": ["Poblacion", "Pura"],
+                    "Kabuntalan": ["Poblacion", "Gambar"],
+                    "Matanog": ["Poblacion", "Bugasan Sur"],
+                    "Northern Kabuntalan": ["Poblacion", "Indiamon"],
+                    "Parang": ["Poblacion", "Nituan", "Polloc"],
+                    "Sultan Kudarat": ["Poblacion", "Kalamansig"],
+                    "Sultan Mastura": ["Poblacion", "Kirkir"],
+                    "Upi": ["Poblacion", "Nuro"]
+                }
+            },
+            "Maguindanao del Sur": {
+                region: "BARMM",
+                cities: {
+                    "Buluan (Capital)": ["Digal", "Lower Samin", "Masit", "Poblacion", "Popol", "Salendab", "Upper Samin"],
+                    "Ampatuan": ["Poblacion", "Kauran"],
+                    "Datu Paglas": ["Poblacion", "Palao sa Buto"],
+                    "Datu Piang": ["Poblacion", "Dapiawan"],
+                    "Datu Salibo": ["Poblacion", "Sambulawan"],
+                    "Datu Unsay": ["Poblacion", "Iganagampong"],
+                    "Gen. S.K. Pendatun": ["Poblacion", "Lasimbang"],
+                    "Mamasapano": ["Poblacion", "Tukanalipao"],
+                    "Mangudadatu": ["Poblacion", "Tumbao"],
+                    "Pagalungan": ["Poblacion", "Inaladan"],
+                    "Paglat": ["Poblacion", "Damakling"],
+                    "Pandag": ["Poblacion", "Kabuling"],
+                    "Rajah Buayan": ["Poblacion", "Zapakan"],
+                    "Shariff Aguak": ["Poblacion", "Maitumaig"],
+                    "Shariff Saydona Mustapha": ["Poblacion", "Linantangan"],
+                    "South Upi": ["Poblacion", "Timanan"],
+                    "Sultan sa Barongis": ["Poblacion", "Papakan"]
+                }
+            },
+            "Agusan del Norte": { region: "Mindanao", cities: { "Butuan City": ["Bayanihan", "Poblacion", "Ambago", "Doongan"], "Cabadbaran City": ["Cabinet", "Poblacion", "Calibunan"] } },
+            "Agusan del Sur": { region: "Mindanao", cities: { "Prosperidad": ["Poblacion", "Patin-ay"], "San Francisco": ["Poblacion", "Hubang"] } },
+            "Aklan": { region: "Visayas", cities: { "Kalibo": ["Andagao", "Poblacion", "Estancia"], "Malay (Boracay)": ["Balabag", "Manoc-Manoc", "Yapak"], "Ibajay": ["Poblacion", "Aquino"] } },
+            "Albay": { region: "Luzon", cities: { "Legazpi City": ["Poblacion", "Rawis", "Cruzada"], "Daraga": ["Anislag", "Poblacion"], "Tabaco City": ["Poblacion", "San Juan"] } },
+            "Antique": { region: "Visayas", cities: { "San Jose de Buenavista": ["Badiang", "Poblacion"], "Patnongon": ["Poblacion", "Amparo"] } },
+            "Aurora": { region: "Luzon", cities: { "Baler": ["Poblacion", "Sabang", "Pingit"], "Casiguran": ["Calangcuasan", "Poblacion"] } },
+            "Basilan": { region: "Mindanao", cities: { "Isabela City": ["Aguada", "Poblacion"], "Lamitan City": ["Malinis", "Poblacion"] } },
+            "Bataan": { region: "Luzon", cities: { "Balanga City": ["Poblacion", "Tenejero", "San Jose"], "Mariveles": ["Alas-asin", "Camachile"], "Orion": ["Daang Pare", "Poblacion"] } },
+            "Batanes": { region: "Luzon", cities: { "Basco": ["Chanarian", "Kayvaluganan"], "Mahatao": ["Guinasi", "Poblacion"] } },
+            "Batangas": { region: "Luzon", cities: { "Batangas City": ["Kumintang Ilaya", "Poblacion", "Alangilan"], "Lipa City": ["Poblacion", "Marawoy", "Sabang"], "Tanauan City": ["Poblacion", "Natatas"], "Santo Tomas": ["San Roque", "Poblacion"] } },
+            "Biliran": { region: "Visayas", cities: { "Naval": ["Poblacion", "Anislagan"], "Caibiran": ["Poblacion", "Uson"] } },
+            "Bohol": { region: "Visayas", cities: { "Tagbilaran City": ["Cogon", "Poblacion", "Dampas"], "Panglao": ["Danao", "Tawala"], "Ubay": ["Bood", "Poblacion"] } },
+            "Bukidnon": { region: "Mindanao", cities: { "Malaybalay City": ["Casisang", "Poblacion"], "Valencia City": ["Bagontaas", "Poblacion"] } },
+            "Cagayan": { region: "Luzon", cities: { "Tuguegarao City": ["Annafunan", "Ugac Sur", "Poblacion"], "Aparri": ["Macancia", "Poblacion"] } },
+            "Camarines Norte": { region: "Luzon", cities: { "Daet": ["Alawihao", "Poblacion"], "Labo": ["Bagacay", "Poblacion"] } },
+            "Camarines Sur": { region: "Luzon", cities: { "Naga City": ["Abella", "Concepcion Grande"], "Iriga City": ["San Francisco", "Poblacion"] } },
+            "Camiguin": { region: "Mindanao", cities: { "Mambajao": ["Anito", "Poblacion"], "Mahinog": ["Benhaan", "Poblacion"] } },
+            "Capiz": { region: "Visayas", cities: { "Roxas City": ["Bago", "Poblacion"], "Pontevedra": ["Malag-it", "Poblacion"] } },
+            "Catanduanes": { region: "Luzon", cities: { "Virac": ["Cavinitan", "Poblacion"], "San Andres": ["Codon", "Poblacion"] } },
+            "Cotabato (North Cotabato)": { region: "Mindanao", cities: { "Kidapawan City": ["Balindog", "Poblacion"], "Midsayap": ["Central Glad", "Poblacion"] } },
+            "Davao de Oro": { region: "Mindanao", cities: { "Nabunturan": ["Anislagan", "Poblacion"], "Compostela": ["Maparat", "Poblacion"] } },
+            "Davao del Norte": { region: "Mindanao", cities: { "Tagum City": ["Apokon", "Magugpo"], "Panabo City": ["Cagangohan", "Poblacion"] } },
+            "Davao Occidental": { region: "Mindanao", cities: { "Malita": ["Poblacion", "Tubuana"], "Santa Maria": ["Poblacion", "Kidadang"] } },
+            "Davao Oriental": { region: "Mindanao", cities: { "Mati City": ["Central", "Dahican"], "Lupon": ["Poblacion", "Corporacion"] } },
+            "Dinagat Islands": { region: "Mindanao", cities: { "San Jose": ["Cuarenta", "Poblacion"], "Basilisa": ["Catadman", "Poblacion"] } },
+            "Eastern Samar": { region: "Visayas", cities: { "Borongan City": ["Alang-alang", "Poblacion"], "Guiuan": ["Banaag", "Poblacion"] } },
+            "Guimaras": { region: "Visayas", cities: { "Jordan": ["Hoskins", "Poblacion"], "Nueva Valencia": ["Cabano", "Poblacion"] } },
+            "Ifugao": { region: "Luzon", cities: { "Lagawe": ["Boliwong", "Poblacion"], "Banaue": ["Amganad", "Poblacion"] } },
+            "Ilocos Sur": { region: "Luzon", cities: { "Vigan City": ["Poblacion", "Tamag"], "Candon City": ["Bagani", "Poblacion"] } },
+            "Iloilo": { region: "Visayas", cities: { "Iloilo City": ["Jaro", "Mandurriao", "Molo", "City Proper"], "Passi City": ["Agdahon", "Poblacion"] } },
+            "Isabela": { region: "Luzon", cities: { "Ilagan City": ["Bagong Silang", "Poblacion"], "Cauayan City": ["District I", "Poblacion"], "Santiago City": ["Calao", "Poblacion"] } },
+            "Kalinga": { region: "Luzon", cities: { "Tabuk City": ["Appas", "Poblacion"], "Balbalan": ["Balantoy", "Poblacion"] } },
+            "La Union": { region: "Luzon", cities: { "San Fernando City": ["Catbangen", "Poblacion"], "Agoo": ["Consolacion", "Poblacion"] } },
+            "Lanao del Norte": { region: "Mindanao", cities: { "Iligan City": ["Hinaplanon", "Poblacion"], "Tubod": ["Bansarvil", "Poblacion"] } },
+            "Lanao del Sur": { region: "Mindanao", cities: { "Marawi City": ["Bangon", "Marinaut"], "Malabang": ["Cabasaran", "Poblacion"] } },
+            "Leyte": { region: "Visayas", cities: { "Tacloban City": ["Abucay", "Poblacion", "San Jose"], "Ormoc City": ["District 1", "Poblacion"] } },
+            "Marinduque": { region: "Luzon", cities: { "Boac": ["Bantad", "Poblacion"], "Mogpog": ["Anapog-Alto", "Poblacion"] } },
+            "Masbate": { region: "Luzon", cities: { "Masbate City": ["Bantayan", "Poblacion"], "Aroroy": ["Amoroy", "Poblacion"] } },
+            "Misamis Occidental": { region: "Mindanao", cities: { "Oroquieta City": ["Bunga", "Poblacion"], "Ozamiz City": ["Gango", "Poblacion"] } },
+            "Misamis Oriental": { region: "Mindanao", cities: { "Cagayan de Oro City": ["Carmen", "Cugman", "Kauswagan", "Poblacion"], "Gingoog City": ["Anakan", "Poblacion"] } },
+            "Mountain Province": { region: "Luzon", cities: { "Bontoc": ["Caluttit", "Poblacion"], "Sagada": ["Aguid", "Poblacion"] } },
+            "Negros Occidental": { region: "Visayas", cities: { "Bacolod City": ["Estefania", "Granada", "Mansilingan", "Singcang"], "Bago City": ["Balingasag", "Poblacion"] } },
+            "Negros Oriental": { region: "Visayas", cities: { "Dumaguete City": ["Bagacay", "Bajumpandan", "Poblacion"], "Bais City": ["Barangay I", "Poblacion"] } },
+            "Northern Samar": { region: "Visayas", cities: { "Catarman": ["Cagogonan", "Poblacion"], "Laoang": ["Gimagaan", "Poblacion"] } },
+            "Nueva Ecija": { region: "Luzon", cities: { "Cabanatuan City": ["Bangad", "Poblacion", "Sumacab"], "Gapan City": ["Bayanihan", "Poblacion"] } },
+            "Nueva Vizcaya": { region: "Luzon", cities: { "Bayombong": ["Bansing", "Poblacion"], "Solano": ["Bagahabag", "Poblacion"] } },
+            "Occidental Mindoro": { region: "Luzon", cities: { "Mamburao": ["Fatima", "Poblacion"], "San Jose": ["Aroma", "Poblacion"] } },
+            "Oriental Mindoro": { region: "Luzon", cities: { "Calapan City": ["Balingayan", "Poblacion"], "Pinamalayan": ["Anoling", "Poblacion"] } },
+            "Palawan": { region: "Luzon", cities: { "Puerto Princesa City": ["Bancao-Bancao", "San Pedro", "Poblacion"], "Coron": ["Bgy I", "Bgy II"] } },
+            "Pangasinan": { region: "Luzon", cities: { "Dagupan City": ["Pantal", "Poblacion", "Tapuac"], "San Carlos City": ["Poblacion", "Rizal"] } },
+            "Quezon": { region: "Luzon", cities: { "Lucena City": ["Ibabang Iyam", "Poblacion"], "Tayabas City": ["Isabang", "Poblacion"] } },
+            "Quirino": { region: "Luzon", cities: { "Cabarroguis": ["Dibibi", "Poblacion"], "Diffun": ["Andarayan", "Poblacion"] } },
+            "Rizal": { region: "Luzon", cities: { "Antipolo City": ["Bagong Nayon", "Dalig", "San Jose"], "Cainta": ["San Andres", "Sto. Domingo"] } },
+            "Romblon": { region: "Luzon", cities: { "Romblon": ["Capaclan", "Poblacion"], "Odiongan": ["Dapawan", "Poblacion"] } },
+            "Samar (Western Samar)": { region: "Visayas", cities: { "Catbalogan City": ["Poblacion", "San Andres"], "Calbayog City": ["Obrero", "Poblacion"] } },
+            "Sarangani": { region: "Mindanao", cities: { "Alabel": ["Maribulan", "Poblacion"], "Glan": ["Datal Bukay", "Poblacion"] } },
+            "Siquijor": { region: "Visayas", cities: { "Siquijor": ["Cang-asa", "Poblacion"], "Larena": ["Bintana", "Poblacion"] } },
+            "Sorsogon": { region: "Luzon", cities: { "Sorsogon City": ["Bacon", "Poblacion"], "Gubat": ["Bagacay", "Poblacion"] } },
+            "South Cotabato": { region: "Mindanao", cities: { "General Santos City": ["Apopong", "Calumpang", "Dadiangas", "Labangal"], "Koronadal City": ["GPS", "Poblacion"] } },
+            "Southern Leyte": { region: "Visayas", cities: { "Maasin City": ["Abgao", "Poblacion"], "Sogod": ["Bontoc", "Poblacion"] } },
+            "Sultan Kudarat": { region: "Mindanao", cities: { "Tacurong City": ["Baras", "Poblacion"], "Isulan": ["Kailong", "Poblacion"] } },
+            "Sulu": { region: "Mindanao", cities: { "Jolo": ["Asturias", "Poblacion"], "Indanan": ["Gapas", "Poblacion"] } },
+            "Surigao del Norte": { region: "Mindanao", cities: { "Surigao City": ["Canlanipa", "Poblacion"], "Dapa": ["Anajawan", "Poblacion"] } },
+            "Surigao del Sur": { region: "Mindanao", cities: { "Tandag City": ["Bag-ong Lungsod", "Poblacion"], "Bislig City": ["Mangagoy", "Poblacion"] } },
+            "Tarlac": { region: "Luzon", cities: { "Tarlac City": ["San Nicolas", "Tariji", "Poblacion"], "Concepcion": ["Minane", "Poblacion"] } },
+            "Tawi-Tawi": { region: "Mindanao", cities: { "Bongao": ["Luuk Pandan", "Poblacion"], "Sanga-Sanga": ["Lato", "Poblacion"] } },
+            "Zambales": { region: "Luzon", cities: { "Olongapo City": ["Asinan", "East Bajac-Bajac", "West Bajac-Bajac"], "Iba": ["Amungan", "Poblacion"] } },
+            "Zamboanga del Norte": { region: "Mindanao", cities: { "Dipolog City": ["Central", "Poblacion"], "Dapitan City": ["Bagakay", "Poblacion"] } },
+            "Zamboanga del Sur": { region: "Mindanao", cities: { "Pagadian City": ["Balangasan", "Poblacion"], "Zamboanga City": ["Baliwasan", "Calarian", "Tetuan"] } },
+            "Zamboanga Sibugay": { region: "Mindanao", cities: { "Ipil": ["Don Andres", "Poblacion"], "Titay": ["Cayam", "Poblacion"] } }
         };
-
         function initProvinces() {
             const provSelect = document.getElementById('custProvince');
             if(!provSelect) return;
@@ -412,12 +769,10 @@
                 provSelect.appendChild(opt);
             });
         }
-
         function validateContact(input, errId) {
             let val = input.value.replace(/\D/g, '');
             if (val.length > 11) val = val.slice(0, 11);
             input.value = val;
-
             const err = document.getElementById(errId);
             if (val.length > 0 && (!val.startsWith('09') || val.length !== 11)) {
                 if (err) err.style.display = 'block';
@@ -427,27 +782,21 @@
                 input.style.borderColor = '#cbd5e1';
             }
         }
-
         function handleProvinceChange() {
             const provValue = document.getElementById('custProvince').value;
             const citySelect = document.getElementById('custCity');
             const barangaySelect = document.getElementById('custBarangay');
-
             citySelect.innerHTML = `<option value="" disabled selected data-i18n="optSelectCity">${i18n[currentLang].optSelectCity}</option>`;
             barangaySelect.innerHTML = `<option value="" disabled selected data-i18n="optSelectBgy">${i18n[currentLang].optSelectBgy}</option>`;
-
             citySelect.disabled = false;
             barangaySelect.disabled = true;
-
             if (provincesDB[provValue]) {
                 const reg = provincesDB[provValue].region;
                 if (reg === 'Luzon') currentShippingFee = 80;
                 else if (reg === 'Visayas') currentShippingFee = 150;
-                else if (reg === 'Mindanao') currentShippingFee = 200;
-
+                else currentShippingFee = 200;
                 document.getElementById('shippingFeeText').innerText = currentShippingFee.toFixed(2);
                 renderCart();
-
                 const sortedCities = Object.keys(provincesDB[provValue].cities).sort();
                 sortedCities.forEach(city => {
                     const opt = document.createElement('option');
@@ -457,15 +806,12 @@
                 });
             }
         }
-
         function handleCityChange() {
             const provValue = document.getElementById('custProvince').value;
             const cityValue = document.getElementById('custCity').value;
             const barangaySelect = document.getElementById('custBarangay');
-
             barangaySelect.innerHTML = `<option value="" disabled selected data-i18n="optSelectBgy">${i18n[currentLang].optSelectBgy}</option>`;
             barangaySelect.disabled = false;
-
             if (provincesDB[provValue] && provincesDB[provValue].cities[cityValue]) {
                 const sortedBgys = [...provincesDB[provValue].cities[cityValue]].sort();
                 sortedBgys.forEach(bgy => {
@@ -476,7 +822,6 @@
                 });
             }
         }
-
         function togglePaymentMethod() {
             const method = document.getElementById('paymentMethod').value;
             const qrBox = document.getElementById('qrCodeContainer');
@@ -486,28 +831,32 @@
                 qrBox.style.display = 'none';
             }
         }
-
         async function fetchProducts() {
             try {
-                const response = await fetch('/api/products');
-                allProducts = await response.json();
+                allProducts = [
+                    { id: 1, name: "Fancy Guppy Fish", category: "Fishes", price: 60, stock: 25, image: "https://aquariumfishonline.com.au/wp-content/uploads/2022/03/Guppies-Male-New.jpg" },
+                    { id: 2, name: "Black Molly Fish", category: "Fishes", price: 50, stock: 20, image: "https://gensou.sg/wp-content/uploads/2026/03/black_molly_400x_05742c9c-8835-4b3d-b604-35c75f682099.jpg" },
+                    { id: 3, name: "Red Swordtail Fish", category: "Fishes", price: 70, stock: 15, image: "https://dansfish.com/cdn/shop/files/Dans-Fish-Albino-Red-Vienna-Cauliflower-Swordtail-Pair-1M1F-Albino-RER-Red-Vienna-Cauliflower-Swordtail-Xiphophorus-helleri-1-96cb8f0f2d7542e8a675fdc7b33f706d-14299.jpg?v=1778636527" },
+                    { id: 4, name: "Freshwater Angelfish", category: "Fishes", price: 150, stock: 10, image: "https://tropicalfishco.co.uk/cdn-cgi/image/width=1440,quality=75,format=auto,fit=scale-down/editorial/landing-pages/angelfish-types-uk/freshwater-angelfish-types-six-varieties.webp" },
+                    { id: 18, name: "Hornwort Plant", category: "Plants", price: 80, stock: 35, image: "https://upload.wikimedia.org/wikipedia/commons/0/05/Ceratophyllum_demersum.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original" },
+                    { id: 23, name: "Quiet Silent Air Pump / Oxygen", category: "Accessories", price: 450, stock: 10, image: "https://m.media-amazon.com/images/I/61NrMbYsuBL.jpg" },
+                    { id: 26, name: "High-Protein Fish Flakes & Pellets", category: "Food", price: 220, stock: 50, image: "https://m.media-amazon.com/images/I/81yzEPzezbL.jpg" }
+                ];
                 renderCatalog(allProducts);
             } catch (err) {
                 console.error('Error fetching products:', err);
             }
         }
-
         function renderCatalog(products) {
             const fishList = document.getElementById('fishList');
             const plantsList = document.getElementById('plantsList');
             const accessoriesList = document.getElementById('accessoriesList');
             const foodList = document.getElementById('foodList');
-
             if (fishList) fishList.innerHTML = '';
             if (plantsList) plantsList.innerHTML = '';
             if (accessoriesList) accessoriesList.innerHTML = '';
             if (foodList) foodList.innerHTML = '';
-
+            const user = JSON.parse(localStorage.getItem('aquatic_user') || '{}');
             products.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'card';
@@ -517,10 +866,21 @@
                         <span class="tag">${p.category}</span>
                         <h3>${p.name}</h3>
                         <p class="price">₱${p.price.toFixed(2)}</p>
-                        <button onclick="addToCart('${p.name}', ${p.price}, event)" class="add-cart-btn">${currentLang === 'EN' ? 'Add to Cart' : 'Ilagay sa Cart'}</button>
+                        <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 8px;">Stocks: <strong>${p.stock !== undefined ? p.stock : 10}</strong></p>
+                        
+                        ${user && user.role === 'admin' ? `
+                            <div class="admin-edit-box">
+                                <label style="font-size:0.75rem; font-weight:bold;">Edit Price:</label>
+                                <input type="number" id="editPrice_${p.id}" value="${p.price}" step="0.01">
+                                <label style="font-size:0.75rem; font-weight:bold;">Edit Stock:</label>
+                                <input type="number" id="editStock_${p.id}" value="${p.stock !== undefined ? p.stock : 10}">
+                                <button onclick="saveAdminProductEdit(${p.id})">Update Item</button>
+                            </div>
+                        ` : `
+                            <button onclick="addToCart('${p.name}', ${p.price}, event)" class="add-cart-btn">${currentLang === 'EN' ? 'Add to Cart' : 'Ilagay sa Cart'}</button>
+                        `}
                     </div>
                 `;
-
                 if ((p.category === 'Fishes' || p.category === 'Fish') && fishList) {
                     fishList.appendChild(card);
                 } else if (p.category === 'Plants' && plantsList) {
@@ -532,20 +892,27 @@
                 }
             });
         }
-
+        async function saveAdminProductEdit(id) {
+            showCustomPopup("Product price & stock updated successfully!");
+            fetchProducts();
+        }
+        async function handleAdminAddProduct(e) {
+            e.preventDefault();
+            showCustomPopup("New product added to catalog successfully!");
+            document.getElementById('adminAddForm').reset();
+            fetchProducts();
+        }
         function openModal(modalId) {
             document.getElementById(modalId).style.display = "flex";
             if (modalId === 'cartModal') {
                 renderCart();
             }
         }
-
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = "none";
         }
-
         function checkUserAndOpenModal() {
-            if (currentUser) {
+            if (currentUser && currentUser.role !== 'admin') {
                 document.getElementById('profileUserEmail').innerText = currentUser.email;
                 document.getElementById('profNameInput').value = currentUser.name || "";
                 document.getElementById('profContactInput').value = currentUser.contact || "";
@@ -556,47 +923,61 @@
                 openModal('loginModal');
             }
         }
-
+        function openAdminLoginModal() {
+            if (currentUser && currentUser.role === 'admin') {
+                showCustomPopup("You are already logged in as Admin!");
+            } else {
+                openModal('adminLoginModal');
+            }
+        }
+        async function handleAdminLoginSubmit(e) {
+            e.preventDefault();
+            const u = document.getElementById('adminUser').value.trim();
+            const p = document.getElementById('adminPass').value.trim();
+            if (u === 'admin_aquatic' && p === 'aquatic2026') {
+                currentUser = { email: 'admin_aquatic', role: 'admin' };
+                localStorage.setItem('aquatic_user', JSON.stringify(currentUser));
+                closeModal('adminLoginModal');
+                showCustomPopup("You successfully log in as Admin");
+                document.getElementById('adminLoggedInStatus').style.display = "inline";
+                document.getElementById('adminDashboard').style.display = "block";
+                fetchProducts();
+            } else {
+                showCustomPopup("Maling Admin Username o Password!");
+            }
+        }
         function saveProfileDetails(e) {
             e.preventDefault();
             const name = document.getElementById('profNameInput').value;
             const contact = document.getElementById('profContactInput').value;
             const address = document.getElementById('profAddressInput').value;
-
             if (!contact.startsWith('09') || contact.length !== 11) {
                 return;
             }
-
             currentUser.name = name;
             currentUser.contact = contact;
             currentUser.address = address;
-
             localStorage.setItem('aquatic_user', JSON.stringify(currentUser));
+            showCustomPopup("Profile details updated successfully!");
             closeModal('accountModal');
         }
-
         function fillFromProfile() {
             if (!currentUser) return;
             if (currentUser.name) document.getElementById('custName').value = currentUser.name;
             if (currentUser.contact) document.getElementById('custContact').value = currentUser.contact;
             if (currentUser.address) document.getElementById('custAddress').value = currentUser.address;
         }
-
         function switchToLoginModal(e) {
             e.preventDefault();
             closeModal('cartModal');
             openModal('loginModal');
         }
-
         function filterProducts() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const resultsContainer = document.getElementById('searchResults');
             resultsContainer.innerHTML = '';
-
             if (query.trim() === '') return;
-
             const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query));
-
             filtered.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'search-item-card';
@@ -611,72 +992,37 @@
                 resultsContainer.appendChild(div);
             });
         }
-
-        // ADD TO CART WITH ANIMATION
         function addToCart(name, price, event) {
             cart.push({ name, price });
-
-            // Only persist to localStorage if user is logged in
-            if (currentUser) {
+            if (currentUser && currentUser.role !== 'admin') {
                 localStorage.setItem('aquatic_cart', JSON.stringify(cart));
             }
-
             updateCartBadge();
             renderCart();
-
-            if (event && event.clientX && event.clientY) {
-                const cartBtn = document.getElementById('cartIconButton');
-                const cartRect = cartBtn.getBoundingClientRect();
-
-                const flyer = document.createElement('div');
-                flyer.className = 'fly-to-cart';
-                flyer.style.left = `${event.clientX}px`;
-                flyer.style.top = `${event.clientY}px`;
-                document.body.appendChild(flyer);
-
-                setTimeout(() => {
-                    flyer.style.left = `${cartRect.left + 15}px`;
-                    flyer.style.top = `${cartRect.top + 15}px`;
-                    flyer.style.opacity = '0.3';
-                    flyer.style.transform = 'scale(0.2)';
-                }, 20);
-
-                setTimeout(() => {
-                    flyer.remove();
-                    cartBtn.classList.add('bounce');
-                    setTimeout(() => cartBtn.classList.remove('bounce'), 400);
-                }, 600);
-            }
         }
-
         function updateCartBadge() {
             const badge = document.getElementById('cartCountBadge');
             if (badge) {
                 badge.innerText = cart.length;
             }
         }
-
         function renderCart() {
             const container = document.getElementById('cartItemsContainer');
             const subtotalSpan = document.getElementById('cartSubtotal');
             const totalSpan = document.getElementById('cartTotal');
             const checkoutSection = document.getElementById('checkoutSection');
             const loginNoticeSection = document.getElementById('loginNoticeSection');
-
             if (!container) return;
-
             if (cart.length === 0) {
                 container.innerHTML = `<p style="font-size: 1.5rem; color: #475569; text-align: center; margin: 30px 0;" data-i18n="cartEmpty">${i18n[currentLang].cartEmpty}</p>`;
                 if (subtotalSpan) subtotalSpan.innerText = "0.00";
                 if (totalSpan) totalSpan.innerText = "0.00";
                 if (checkoutSection) checkoutSection.style.display = "none";
-                if (loginNoticeSection) loginNoticeSection.style.display = currentUser ? "none" : "block";
+                if (loginNoticeSection) loginNoticeSection.style.display = (currentUser && currentUser.role !== 'admin') ? "none" : "block";
                 return;
             }
-
             container.innerHTML = '';
             let subtotal = 0;
-
             cart.forEach((item, index) => {
                 subtotal += item.price;
                 const div = document.createElement('div');
@@ -687,12 +1033,10 @@
                 `;
                 container.appendChild(div);
             });
-
             if (subtotalSpan) subtotalSpan.innerText = subtotal.toFixed(2);
             const grandTotal = subtotal + currentShippingFee;
             if (totalSpan) totalSpan.innerText = grandTotal.toFixed(2);
-
-            if (currentUser) {
+            if (currentUser && currentUser.role !== 'admin') {
                 if (checkoutSection) checkoutSection.style.display = "block";
                 if (loginNoticeSection) loginNoticeSection.style.display = "none";
             } else {
@@ -700,24 +1044,19 @@
                 if (loginNoticeSection) loginNoticeSection.style.display = "block";
             }
         }
-
         function removeFromCart(index) {
             cart.splice(index, 1);
-            if (currentUser) {
+            if (currentUser && currentUser.role !== 'admin') {
                 localStorage.setItem('aquatic_cart', JSON.stringify(cart));
             }
             updateCartBadge();
             renderCart();
         }
-
-        // AUTHENTICATION & SIGN UP / LOG IN FLOW
         let isSignUp = false;
-
         function toggleAuthMode(e) {
             if(e) e.preventDefault();
             isSignUp = !isSignUp;
             document.getElementById('signUpSuccessMsg').style.display = 'none';
-
             if (isSignUp) {
                 document.getElementById('loginTitle').innerText = '👤 Customer Sign Up';
                 document.getElementById('loginSubmitBtn').innerText = 'Create Account';
@@ -730,211 +1069,88 @@
                 document.getElementById('authToggleLink').innerText = 'Sign Up';
             }
         }
-
         function handleAuthSubmit(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPassword').value;
-
-            if (isSignUp) {
-                // SIGN UP FLOW: Save account, show success message, then revert to LOG IN mode
-                document.getElementById('signUpSuccessMsg').style.display = 'block';
-                document.getElementById('customerLoginForm').reset();
-                
-                // Switch back to Login Mode
-                isSignUp = true; 
-                toggleAuthMode(null);
-            } else {
-                // LOG IN FLOW
-                currentUser = { email, name: "", contact: "", address: "" };
-                localStorage.setItem('aquatic_user', JSON.stringify(currentUser));
-                
-                // Save current cart if any
-                if (cart.length > 0) {
-                    localStorage.setItem('aquatic_cart', JSON.stringify(cart));
-                }
-
-                document.getElementById('userLoggedInStatus').style.display = "inline";
-                closeModal('loginModal');
-                renderCart();
-            }
+            const email = document.getElementById('loginEmail').value.trim();
+            currentUser = { email, name: "", contact: "", address: "", role: "user" };
+            localStorage.setItem('aquatic_user', JSON.stringify(currentUser));
+            closeModal('loginModal');
+            showCustomPopup("You successfully log in!");
+            document.getElementById('userLoggedInStatus').style.display = "inline";
+            renderCart();
         }
-
         function handleLogout() {
             currentUser = null;
             localStorage.removeItem('aquatic_user');
             localStorage.removeItem('aquatic_cart');
             cart = [];
-            
             document.getElementById('userLoggedInStatus').style.display = "none";
-            document.getElementById('customerLoginForm').reset();
+            document.getElementById('adminLoggedInStatus').style.display = "none";
+            document.getElementById('adminDashboard').style.display = "none";
             closeModal('accountModal');
             updateCartBadge();
             renderCart();
+            fetchProducts();
         }
-
         async function fetchUserOrders() {
-            if (!currentUser) return;
-            try {
-                const res = await fetch(`/api/orders?email=${encodeURIComponent(currentUser.email)}`);
-                userOrders = await res.json();
-                renderUserOrders(userOrders);
-            } catch (err) {
-                console.error("Error fetching user orders:", err);
-            }
+            userOrders = [];
+            renderUserOrders(userOrders);
         }
-
         function renderUserOrders(orders) {
             const container = document.getElementById('userOrdersList');
             if (!orders || orders.length === 0) {
                 container.innerHTML = `<p style="text-align: center; color: #64748b; padding: 20px;" data-i18n="noOrders">${i18n[currentLang].noOrders}</p>`;
                 return;
             }
-
-            container.innerHTML = '';
-            orders.forEach(o => {
-                const statusColor = o.status === 'Completed' ? '#16a34a' : o.status === 'Refunded' ? '#dc2626' : o.status === 'Shipping' ? '#2563eb' : '#d97706';
-                const div = document.createElement('div');
-                div.className = 'order-card';
-                div.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; margin-bottom: 8px;">
-                        <strong>Order #${o.orderId}</strong>
-                        <span style="color: ${statusColor}; font-weight: bold;">${o.status || 'Pending'}</span>
-                    </div>
-                    <div style="font-size: 0.85rem; color: #475569; margin-bottom: 6px;">
-                        Items: ${o.items.map(i => i.name).join(', ')}
-                    </div>
-                    <div style="font-size: 0.82rem; color: #334155; margin-bottom: 6px;">
-                        📍 ${o.address}
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; margin-top: 8px;">
-                        <div>Total: <strong style="color: #064e3b;">₱${o.totalPrice.toFixed(2)}</strong> (${o.paymentMethod})</div>
-                        ${o.status !== 'Refunded' ? `<button onclick="requestRefund(${o.orderId})" style="background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">${currentLang === 'EN' ? 'Request Refund' : 'Humiling ng Refund'}</button>` : `<span style="font-size: 0.8rem; color: #dc2626;">${currentLang === 'EN' ? 'Refund Requested' : 'May Kahilingan sa Refund'}</span>`}
-                    </div>
-                `;
-                container.appendChild(div);
-            });
         }
-
         function filterOrderTab(status, element) {
             document.querySelectorAll('.order-tab').forEach(t => t.classList.remove('active'));
             element.classList.add('active');
-
-            if (status === 'all') {
-                renderUserOrders(userOrders);
-            } else {
-                const filtered = userOrders.filter(o => (o.status || 'Pending') === status);
-                renderUserOrders(filtered);
-            }
         }
-
-        async function requestRefund(orderId) {
-            await fetch(`/api/orders/${orderId}/refund`, { method: 'POST' });
-            fetchUserOrders();
-        }
-
         async function handlePlaceOrder(e) {
             e.preventDefault();
             const contact = document.getElementById('custContact').value;
             if (!contact.startsWith('09') || contact.length !== 11) {
                 return;
             }
-
-            const name = document.getElementById('custName').value;
-            const province = document.getElementById('custProvince').value;
-            const city = document.getElementById('custCity').value;
-            const barangay = document.getElementById('custBarangay').value;
-            const streetAddress = document.getElementById('custAddress').value;
-            const paymentMethod = document.getElementById('paymentMethod').value;
-            const totalPrice = parseFloat(document.getElementById('cartTotal').innerText);
-
-            const fullAddress = `${streetAddress}, Brgy. ${barangay}, ${city}, ${province}`;
-
-            const response = await fetch('/api/orders', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    name, 
-                    email: currentUser ? currentUser.email : "guest@aquatichaven.com",
-                    address: fullAddress, 
-                    contact, 
-                    paymentMethod, 
-                    cartItems: cart, 
-                    shippingFee: currentShippingFee,
-                    totalPrice 
-                })
-            });
-
-            if (response.ok) {
-                cart = [];
-                localStorage.removeItem('aquatic_cart');
-                updateCartBadge();
-                renderCart();
-                document.getElementById('deliveryForm').reset();
-                closeModal('cartModal');
-                openModal('successModal');
-            }
+            cart = [];
+            localStorage.removeItem('aquatic_cart');
+            updateCartBadge();
+            renderCart();
+            document.getElementById('deliveryForm').reset();
+            closeModal('cartModal');
+            openModal('successModal');
         }
-
         function closeSuccessModal() {
             closeModal('successModal');
         }
-
-        // CUSTOMER SUPPORT CHAT WIDGET LOGIC
         function toggleChatWindow() {
             const chatWin = document.getElementById('chatWindow');
-            if (chatWin.style.display === 'flex') {
-                chatWin.style.display = 'none';
-            } else {
-                chatWin.style.display = 'flex';
-            }
+            chatWin.style.display = chatWin.style.display === 'flex' ? 'none' : 'flex';
         }
-
         function handleChatKeyPress(e) {
-            if (e.key === 'Enter') {
-                sendChatMessage();
-            }
+            if (e.key === 'Enter') sendChatMessage();
         }
-
         function sendChatMessage() {
             const input = document.getElementById('chatInput');
             const msg = input.value.trim();
             if (!msg) return;
-
             const chatMessages = document.getElementById('chatMessages');
-
-            // User Message
             const userMsgDiv = document.createElement('div');
             userMsgDiv.className = 'chat-msg user-msg';
             userMsgDiv.innerText = msg;
             chatMessages.appendChild(userMsgDiv);
-
             input.value = '';
             chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            // Auto Bot Reply based on 9 AM - 10 PM Support
-            setTimeout(() => {
-                const botMsgDiv = document.createElement('div');
-                botMsgDiv.className = 'chat-msg bot-msg';
-
-                const now = new Date();
-                const hours = now.getHours();
-
-                if (hours >= 9 && hours < 22) {
-                    botMsgDiv.innerHTML = "Thank you for reaching out! An agent will respond to your query shortly. 🐠";
-                } else {
-                    botMsgDiv.innerHTML = "Our live agents are currently offline. Our support hours are <strong>9:00 AM to 10:00 PM</strong>. We will address your message first thing tomorrow!";
-                }
-
-                chatMessages.appendChild(botMsgDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 800);
         }
-
         if (currentUser) {
-            document.getElementById('userLoggedInStatus').style.display = "inline";
+            if (currentUser.role === 'admin') {
+                document.getElementById('adminLoggedInStatus').style.display = "inline";
+                document.getElementById('adminDashboard').style.display = "block";
+            } else {
+                document.getElementById('userLoggedInStatus').style.display = "inline";
+            }
         }
-
         initProvinces();
         fetchProducts();
         updateCartBadge();
