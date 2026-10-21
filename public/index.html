@@ -833,15 +833,11 @@
         }
         async function fetchProducts() {
             try {
-                allProducts = [
-                    { id: 1, name: "Fancy Guppy Fish", category: "Fishes", price: 60, stock: 25, image: "https://aquariumfishonline.com.au/wp-content/uploads/2022/03/Guppies-Male-New.jpg" },
-                    { id: 2, name: "Black Molly Fish", category: "Fishes", price: 50, stock: 20, image: "https://gensou.sg/wp-content/uploads/2026/03/black_molly_400x_05742c9c-8835-4b3d-b604-35c75f682099.jpg" },
-                    { id: 3, name: "Red Swordtail Fish", category: "Fishes", price: 70, stock: 15, image: "https://dansfish.com/cdn/shop/files/Dans-Fish-Albino-Red-Vienna-Cauliflower-Swordtail-Pair-1M1F-Albino-RER-Red-Vienna-Cauliflower-Swordtail-Xiphophorus-helleri-1-96cb8f0f2d7542e8a675fdc7b33f706d-14299.jpg?v=1778636527" },
-                    { id: 4, name: "Freshwater Angelfish", category: "Fishes", price: 150, stock: 10, image: "https://tropicalfishco.co.uk/cdn-cgi/image/width=1440,quality=75,format=auto,fit=scale-down/editorial/landing-pages/angelfish-types-uk/freshwater-angelfish-types-six-varieties.webp" },
-                    { id: 18, name: "Hornwort Plant", category: "Plants", price: 80, stock: 35, image: "https://upload.wikimedia.org/wikipedia/commons/0/05/Ceratophyllum_demersum.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original" },
-                    { id: 23, name: "Quiet Silent Air Pump / Oxygen", category: "Accessories", price: 450, stock: 10, image: "https://m.media-amazon.com/images/I/61NrMbYsuBL.jpg" },
-                    { id: 26, name: "High-Protein Fish Flakes & Pellets", category: "Food", price: 220, stock: 50, image: "https://m.media-amazon.com/images/I/81yzEPzezbL.jpg" }
-                ];
+                const response = await fetch('/api/products');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch products');
+                }
+                allProducts = await response.json();
                 renderCatalog(allProducts);
             } catch (err) {
                 console.error('Error fetching products:', err);
