@@ -894,9 +894,32 @@
         }
         async function handleAdminAddProduct(e) {
             e.preventDefault();
-            showCustomPopup("New product added to catalog successfully!");
-            document.getElementById('adminAddForm').reset();
-            fetchProducts();
+            
+            const newProduct = {
+                name: document.getElementById('adminItemName').value,
+                category: document.getElementById('adminItemCategory').value,
+                price: parseFloat(document.getElementById('adminItemPrice').value),
+                stock: parseInt(document.getElementById('adminItemStock').value),
+                image: document.getElementById('adminItemImg').value || "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=500"
+            };
+
+            try {
+                const response = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newProduct)
+                });
+
+                if (response.ok) {
+                    document.getElementById('adminAddForm').reset();
+                    showCustomPopup("New product added to catalog successfully!");
+                    fetchProducts(); // Hihilahin nito agad ang updated list para lumitaw sa screen!
+                } else {
+                    showCustomPopup("Failed to add product.");
+                }
+            } catch (error) {
+                console.error('Error adding product:', error);
+            }
         }
         function openModal(modalId) {
             document.getElementById(modalId).style.display = "flex";
@@ -1152,6 +1175,47 @@
         updateCartBadge();
         renderCart();
         applyLanguage();
+
+        // Ilagay ito sa loob ng <script> tag sa iyong index.html
+document.addEventListener('DOMContentLoaded', () => {
+    const addProductForm = document.getElementById('addProductForm');
+    if (addProductForm) {
+        addProductForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Iwasan ang pag-refresh ng page
+
+            const newProduct = {
+                name: document.getElementById('productName').value,
+                category: document.getElementById('categorySelect').value,
+                price: parseFloat(document.getElementById('priceInput').value),
+                stock: parseInt(document.getElementById('stockInput').value),
+                image: document.getElementById('imageInput').value
+            };
+
+            try {
+                const response = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newProduct)
+                });
+
+                if (response.ok) {
+                    addProductForm.reset();
+                    alert('Product added successfully!');
+
+                    // Tawagin ang fetchProducts para kusa itong lumitaw sa catalog!
+                    fetchProducts(); 
+                } else {
+                    alert('Failed to add product.');
+                }
+            } catch (error) {
+                console.error('Error adding product:', error);
+            }
+        });
+    }
+});
     </script>
 </body>
 </html>
+
